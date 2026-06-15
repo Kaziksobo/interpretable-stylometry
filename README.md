@@ -4,7 +4,7 @@ Research code for a micro-placement project supervised by Dr Paul Nulty (Birkbec
 
 ## Project Overview
 
-Computational stylometry has optimised relentlessly for discriminative accuracy — the ability to tell authors apart, or to detect AI-generated text — at the expense of interpretability. This project addresses that gap by developing syntactic, lexical, and prosodic features that can *explain* how AI-generated prose differs from human writing, rather than merely detecting it.
+Computational stylometry has optimised relentlessly for discriminative accuracy - the ability to tell authors apart, or to detect AI-generated text - at the expense of interpretability. This project addresses that gap by developing syntactic, lexical, and prosodic features that can *explain* how AI-generated prose differs from human writing, rather than merely detecting it.
 
 The analysis is structured around three research questions:
 
