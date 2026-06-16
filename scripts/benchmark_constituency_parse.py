@@ -12,6 +12,7 @@ Usage:
 import time
 from pathlib import Path
 
+import benepar
 import pandas as pd
 import spacy
 
@@ -20,41 +21,25 @@ INPUT = PROJECT_ROOT / "data" / "processed" / "corpus.feather"
 
 SAMPLE_SIZE = 50
 
+spacy.prefer_gpu()
+nlp = spacy.load("en_core_web_trf")
+nlp.add_pipe("benepar", config={"model": "benepar_en3"})
 
-def main():
-    print(f"Loading corpus from {INPUT}")
-    df = pd.read_feather(INPUT)
-    df_sample = df.sample(SAMPLE_SIZE, random_state=42)
-    n_total = len(df)
-    print(f"Loaded {n_total} documents. Benchmarking on {SAMPLE_SIZE}.")
+df = pd.read_feather(INPUT)
+df_sample = df.sample(SAMPLE_SIZE, random_state=42)
 
-    spacy.prefer_gpu()
-    print(f"GPU active: {spacy.prefer_gpu()}")
+start = time.time()
+for _, row in df_sample.iterrows():
+    doc = nlp(row["text"])
+elapsed = time.time() - start
 
-    print("\nLoading constituency parse pipeline (en_core_web_trf + benepar_en3)...")
-    nlp = spacy.load("en_core_web_trf")
-    nlp.add_pipe("benepar", config={"model": "benepar_en3"})
+per_doc = elapsed / SAMPLE_SIZE
+total_estimated = per_doc * len(df)
 
-    texts = df_sample["text"].tolist()
-
-    start = time.time()
-    for _ in nlp.pipe(texts, batch_size=16):
-        pass
-    elapsed = time.time() - start
-
-    per_doc = elapsed / SAMPLE_SIZE
-    total_estimated = per_doc * n_total
-
-    print("\nResults:")
-    print(f"  Sample time ({SAMPLE_SIZE} docs): {elapsed:.1f}s")
-    print(f"  Time per document:               {per_doc:.2f}s")
-    print(
-        (
-            f"  Estimated total ({n_total} docs): {total_estimated / 60:.1f} minutes "
-            f"/ {total_estimated / 3600:.1f} hours"
-        )
+print(f"Time per document: {per_doc:.2f}s")
+print(
+    (
+        f"Estimated total ({len(df)} docs): {total_estimated / 60:.1f} minutes "
+        f"/ {total_estimated / 3600:.1f} hours"
     )
-
-
-if __name__ == "__main__":
-    main()
+)
