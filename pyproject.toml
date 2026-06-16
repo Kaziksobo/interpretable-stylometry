@@ -40,6 +40,8 @@ url = "https://download.pytorch.org/whl/cu132"
 
 [tool.ruff.lint]
 select = ["E", "F", "I"]
+# Disable fix for unused imports (`F401`).
+unfixable = ["F401"]
 
 [build-system]
 requires = ["hatchling"]
