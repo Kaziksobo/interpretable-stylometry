@@ -12,15 +12,16 @@ dependencies = [
     "spacy>=3.8.14",
     "pandas>=2.2.0",
     "numpy>=2.0.0",
-    "jupyter>=1.1.0",
-    "notebook>=7.0.0",
     "matplotlib>=3.9.0",
     "seaborn>=0.13.0",
     "tqdm>=4.66.0",
+    "pyarrow>=24.0.0",
 ]
 
 [project.optional-dependencies]
 dev = [
+    "jupyter>=1.1.0",
+    "notebook>=7.0.0",
     "ipykernel>=6.29.0",
     "ruff>=0.6.0",
 ]
