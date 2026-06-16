@@ -56,7 +56,7 @@ Raw data is not committed to this repository. See the sources above to obtain it
 Requires Python 3.13+. Dependencies are managed with [uv](https://github.com/astral-sh/uv).
 
 ```bash
-git clone https://github.com/<your-username>/interpretable-stylometry.git
+git clone https://github.com/kaziksobo/interpretable-stylometry.git
 cd interpretable-stylometry
 uv sync
 ```
