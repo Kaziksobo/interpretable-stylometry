@@ -6,10 +6,7 @@ import pandas as pd
 import spacy
 from tqdm import tqdm
 
-PROJECT_ROOT = Path("..").resolve()
-
-if str(PROJECT_ROOT) not in sys.path:
-    sys.path.append(str(PROJECT_ROOT))
+PROJECT_ROOT = Path(__file__).parent.parent.parent
 
 INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "corpus.feather"
 OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_parses.feather"
