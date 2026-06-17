@@ -1,4 +1,3 @@
-import sys
 from pathlib import Path
 
 import benepar
@@ -51,35 +50,58 @@ def create_texts_and_contexts(
 
 
 def main():
-
     df = load_data(INPUT_PATH)
 
     records = []
-    skipped = 0
+    skipped_docs = 0
+    skipped_sents = 0
 
     texts_and_contexts = create_texts_and_contexts(df)
 
-    pipe = get_nlp().pipe(texts_and_contexts, as_tuples=True, batch_size=8)
+    # batch_size=1 is required: if a sentence exceeds benepar's 510 token
+    # limit, the ValueError is raised during the batch's forward pass and
+    # would otherwise kill every document in that batch, not just the
+    # offending one.
+    pipe = get_nlp().pipe(texts_and_contexts, as_tuples=True, batch_size=1)
 
-    for doc, ctx in tqdm(pipe, total=len(df), desc="Parsing", unit="doc"):
-        for sent_idx, sent in enumerate(doc.sents):
+    # A plain `for doc, ctx in pipe` cannot recover from an exception
+    # raised mid-batch — the generator is left in an undefined state.
+    # Manually advancing with next() lets us catch the ValueError for
+    # exactly the offending document and continue pulling from the
+    # same pipe, skipping only that one document.
+    doc_iter = iter(pipe)
+    with tqdm(total=len(df), desc="Parsing", unit="doc") as pbar:
+        while True:
             try:
-                parse_str = sent._.parse_string
+                doc, ctx = next(doc_iter)
+            except StopIteration:
+                break
             except ValueError:
-                skipped += 1
+                skipped_docs += 1
+                pbar.update(1)
                 continue
-            records.append(
-                {
-                    "doc_id": ctx["id"],
-                    "domain": ctx["domain"],
-                    "source": ctx["source"],
-                    "sent_idx": sent_idx,
-                    "sent_text": sent.text.strip(),
-                    "parse_str": parse_str,
-                }
-            )
 
-    print(f"Skipped {skipped} sentences due to parsing errors.")
+            pbar.update(1)
+
+            for sent_idx, sent in enumerate(doc.sents):
+                try:
+                    parse_str = sent._.parse_string
+                except ValueError:
+                    skipped_sents += 1
+                    continue
+                records.append(
+                    {
+                        "doc_id": ctx["id"],
+                        "domain": ctx["domain"],
+                        "source": ctx["source"],
+                        "sent_idx": sent_idx,
+                        "sent_text": sent.text.strip(),
+                        "parse_str": parse_str,
+                    }
+                )
+
+    print(f"Skipped {skipped_docs} documents that failed to parse entirely.")
+    print(f"Skipped {skipped_sents} individual sentences exceeding the token limit.")
 
     parsed_df = pd.DataFrame(records)
     parsed_df.to_feather(OUTPUT_PATH)
