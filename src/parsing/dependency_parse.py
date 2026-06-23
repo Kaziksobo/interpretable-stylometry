@@ -88,12 +88,18 @@ def create_texts_and_contexts(
                 "id": int,
                 "domain": str,
                 "source": str,
+                "author": str | None
             }
     """
     texts_and_contexts = []
     for _, row in df.iterrows():
         text = row["text"]
-        metadata = {"id": row["id"], "domain": row["domain"], "source": row["source"]}
+        metadata = {
+            "id": row["id"],
+            "domain": row["domain"],
+            "source": row["source"],
+            "author": row["author"],
+        }
         texts_and_contexts.append((text, metadata))
 
     return texts_and_contexts
@@ -206,6 +212,7 @@ def main() -> None:
                     "doc_id": ctx["id"],
                     "domain": ctx["domain"],
                     "source": ctx["source"],
+                    "author": ctx["author"],
                     "sent_idx": sent_idx,
                     "sent_text": sent.text.strip(),
                     "parse_str": parse_str,

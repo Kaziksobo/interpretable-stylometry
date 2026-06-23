@@ -71,6 +71,11 @@ def load_data(data_path: Path) -> pd.DataFrame:
     return pd.read_feather(data_path)
 
 
+def remove_empty_sentences(df: pd.DataFrame) -> pd.DataFrame:
+    """Removes rows with empty sentences from the dataframe."""
+    return df[df["sent_text"].str.strip() != ""].reset_index(drop=True)
+
+
 def main() -> None:
     """Runs constituency parsing over the full corpus and writes the output.
 
@@ -116,6 +121,7 @@ def main() -> None:
                     "doc_id": row["id"],
                     "domain": row["domain"],
                     "source": row["source"],
+                    "author": row["author"],
                     "sent_idx": sent_idx,
                     "sent_text": sent.text.strip(),
                     "parse_str": parse_str,
@@ -126,9 +132,10 @@ def main() -> None:
     print(f"Skipped {skipped_sents} individual sentences exceeding the token limit.")
 
     parsed_df = pd.DataFrame(records)
-    parsed_df.to_feather(OUTPUT_PATH)
+    cleaned_df = remove_empty_sentences(parsed_df)
+    cleaned_df.to_feather(OUTPUT_PATH)
 
-    print(f"Saved {len(parsed_df)} parsed sentences to {OUTPUT_PATH}.")
+    print(f"Saved {len(cleaned_df)} parsed sentences to {OUTPUT_PATH}.")
 
 
 if __name__ == "__main__":
