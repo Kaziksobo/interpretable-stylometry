@@ -36,17 +36,17 @@ def build_author_lookup(corpus_df: pd.DataFrame) -> pd.DataFrame:
         try:
             doc = nlp(row["text"])
         except ValueError:
-            continue  # failed in the original run too -- nothing to recover for this doc
-        for sent_idx, sent in enumerate(doc.sents):
-            rows.append(
-                {
-                    "source": row["source"],
-                    "doc_id": row["id"],
-                    "sent_idx": sent_idx,
-                    "sent_text": sent.text.strip(),
-                    "author": row["author"],
-                }
-            )
+            continue  # failed in the original run too - nothing to recover for this doc
+        rows.extend(
+            {
+                "source": row["source"],
+                "doc_id": row["id"],
+                "sent_idx": sent_idx,
+                "sent_text": sent.text.strip(),
+                "author": row["author"],
+            }
+            for sent_idx, sent in enumerate(doc.sents)
+        )
     return pd.DataFrame(rows)
 
 
@@ -64,11 +64,11 @@ def recover_authors(parses_path: Path, author_lookup: pd.DataFrame) -> pd.DataFr
         author_lookup,
         on=["source", "doc_id", "sent_idx", "sent_text"],
         how="left",
-        validate="m:1",  # raises if any (source,doc_id,sent_idx,sent_text) is ambiguous across authors
+        validate="m:1",
+        # raises if any (source,doc_id,sent_idx,sent_text) is ambiguous across authors
     )
 
-    n_unmatched = merged["author"].isna().sum()
-    if n_unmatched:
+    if n_unmatched := merged["author"].isna().sum():
         print(
             f"WARNING: {n_unmatched}/{before} reuter rows in {parses_path.name} "
             f"didn't match an author. Inspect before trusting this file."
@@ -100,7 +100,10 @@ def main():
         path.rename(backup)
         fixed.to_feather(path)
         print(
-            f"Patched {path.name} ({len(fixed)} rows); original backed up to {backup.name}"
+            (
+                f"Patched {path.name} ({len(fixed)} rows); "
+                f"original backed up to {backup.name}"
+            )
         )
 
 
