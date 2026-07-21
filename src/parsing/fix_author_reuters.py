@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pandas as pd
 import spacy
+from tqdm import tqdm
 
 PROJECT_ROOT = Path(__file__).parent.parent.parent
 CORPUS_PATH = PROJECT_ROOT / "data" / "processed" / "corpus.feather"
@@ -22,21 +23,20 @@ DEPENDENCY_PATH = PROJECT_ROOT / "data" / "processed" / "dependency_parses.feath
 
 
 def build_author_lookup(corpus_df: pd.DataFrame) -> pd.DataFrame:
-    """Re-derives (source, doc_id, sent_idx, sent_text) -> author for reuter only."""
     spacy.prefer_gpu()
-    nlp = spacy.load(
-        "en_core_web_trf"
-    )  # same model as constituency_parse.py; benepar NOT added
+    nlp = spacy.load("en_core_web_trf")  # no benepar
 
     reuter = corpus_df[corpus_df["domain"] == "reuter"].copy()
     reuter["id"] = reuter["id"].astype(str)
 
     rows = []
-    for _, row in reuter.iterrows():
+    for _, row in tqdm(
+        reuter.iterrows(), total=len(reuter), desc="Re-segmenting reuter"
+    ):
         try:
             doc = nlp(row["text"])
         except ValueError:
-            continue  # failed in the original run too - nothing to recover for this doc
+            continue
         rows.extend(
             {
                 "source": row["source"],
@@ -47,7 +47,28 @@ def build_author_lookup(corpus_df: pd.DataFrame) -> pd.DataFrame:
             }
             for sent_idx, sent in enumerate(doc.sents)
         )
-    return pd.DataFrame(rows)
+    lookup_df = pd.DataFrame(rows)
+
+    # Mirror remove_empty_sentences from constituency_parse.py —
+    # empty sentences were dropped from the parse output so they
+    # won't exist in constituency_parses.feather to join against anyway
+    lookup_df = lookup_df[lookup_df["sent_text"].str.strip() != ""]
+
+    # For any keys still ambiguous after removing empties (genuine
+    # boilerplate collisions between authors), drop both sides rather
+    # than risk misassigning author
+    key_cols = ["source", "doc_id", "sent_idx", "sent_text"]
+    dupes_mask = lookup_df.duplicated(subset=key_cols, keep=False)
+    if n_ambiguous := dupes_mask.sum():
+        print(
+            f"Note: {n_ambiguous} rows remain ambiguous after removing "
+            f"empty sentences (identical boilerplate across authors). "
+            f"Excluding from lookup — affected parse rows will have null author."
+        )
+        lookup_df = lookup_df[~dupes_mask]
+
+    print(f"Lookup built: {len(lookup_df)} unambiguous rows.")
+    return lookup_df
 
 
 def recover_authors(parses_path: Path, author_lookup: pd.DataFrame) -> pd.DataFrame:
@@ -60,19 +81,21 @@ def recover_authors(parses_path: Path, author_lookup: pd.DataFrame) -> pd.DataFr
     reuter = df[df["domain"] == "reuter"].copy()
     before = len(reuter)
 
+    # Left join — rows that couldn't be matched (ambiguous or missing)
+    # get null author rather than being dropped
     merged = reuter.merge(
         author_lookup,
         on=["source", "doc_id", "sent_idx", "sent_text"],
         how="left",
-        validate="m:1",
-        # raises if any (source,doc_id,sent_idx,sent_text) is ambiguous across authors
+        # validate removed — right side is already deduplicated above
     )
 
-    if n_unmatched := merged["author"].isna().sum():
-        print(
-            f"WARNING: {n_unmatched}/{before} reuter rows in {parses_path.name} "
-            f"didn't match an author. Inspect before trusting this file."
-        )
+    n_unmatched = merged["author"].isna().sum()
+    pct = 100 * n_unmatched / before
+    print(
+        f"{parses_path.name}: {n_unmatched}/{before} reuter rows "
+        f"unmatched ({pct:.1f}%) — these will have null author."
+    )
 
     return pd.concat([other, merged], ignore_index=True)
 
