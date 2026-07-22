@@ -1,10 +1,11 @@
+import math
 import multiprocessing as mp
 import time
 from collections import Counter, defaultdict
 from pathlib import Path
 
 import pandas as pd
-from analyze_corpus import compute_pmi_vs_baseline, highlight_in_sentence
+from analyze_corpus import highlight_in_sentence
 from mining import extract_patterns_with_examples
 from nltk import Tree
 from tqdm import tqdm
@@ -47,6 +48,7 @@ def _process_chunk_with_examples(
 def extract_data_parallel(
     df_subset: pd.DataFrame, parse_col: str, text_col: str
 ) -> tuple[Counter, int, dict[str, list[dict[str, str]]]]:
+    # sourcery skip: dict-assign-update-to-union
     """
     Coordinates multi-core execution to gather counts and text examples.
     """
@@ -75,7 +77,7 @@ def extract_data_parallel(
         )
 
         for count_res, example_res in results_iterator:
-            master_counts |= count_res
+            master_counts.update(count_res)
 
             # Merge text examples safely
             for pattern, ex_list in example_res.items():
@@ -117,12 +119,27 @@ def analyze_and_compare_domain(
         claude_df, parse_col, text_col
     )
 
-    # Compute PMI profiles relative to Human Baseline
-    gpt_pmi = compute_pmi_vs_baseline(
-        gpt_counts, gpt_total, human_counts, human_total, min_count
+    def compute_pmi_for_patterns(
+        counts, total, baseline_counts, baseline_total, patterns
+    ):
+        scores = {}
+        for pattern in patterns:
+            count = counts.get(pattern, 0)
+            freq = (count if count > 0 else 0.5) / total
+            b_count = baseline_counts.get(pattern, 0)
+            b_freq = (b_count if b_count > 0 else 0.5) / baseline_total
+            scores[pattern] = math.log2(freq / b_freq)
+        return scores
+
+    candidate_patterns = {p for p, c in gpt_counts.items() if c >= min_count} | {
+        p for p, c in claude_counts.items() if c >= min_count
+    }
+
+    gpt_pmi = compute_pmi_for_patterns(
+        gpt_counts, gpt_total, human_counts, human_total, candidate_patterns
     )
-    claude_pmi = compute_pmi_vs_baseline(
-        claude_counts, claude_total, human_counts, human_total, min_count
+    claude_pmi = compute_pmi_for_patterns(
+        claude_counts, claude_total, human_counts, human_total, candidate_patterns
     )
 
     shared_patterns = set(gpt_pmi.keys()) & set(claude_pmi.keys())
@@ -132,22 +149,23 @@ def analyze_and_compare_domain(
         g_pmi = gpt_pmi[pattern]
         c_pmi = claude_pmi[pattern]
 
-        # Aggregate available text examples across splits for display
-        all_ex = (
-            gpt_examples.get(pattern, [])
-            + claude_examples.get(pattern, [])
-            + human_examples.get(pattern, [])
-        )
-
         comparison_report.append(
             {
                 "pattern": pattern,
                 "gpt_pmi": g_pmi,
                 "claude_pmi": c_pmi,
-                "model_gap": abs(g_pmi - c_pmi),  # Distance between the two AIs
-                "gpt_deviation": abs(g_pmi),  # Absolute distance from humans
-                "claude_deviation": abs(c_pmi),  # Absolute distance from humans
-                "examples": all_ex[:2],
+                "model_gap": abs(g_pmi - c_pmi),
+                "gpt_deviation": abs(g_pmi),
+                "claude_deviation": abs(c_pmi),
+                "gpt_count": gpt_counts.get(pattern, 0),  # <- add
+                "claude_count": claude_counts.get(pattern, 0),  # <- add
+                "categorical": gpt_counts.get(pattern, 0) == 0
+                or claude_counts.get(pattern, 0) == 0,
+                "examples_by_source": {
+                    "gpt": gpt_examples.get(pattern, []),
+                    "claude": claude_examples.get(pattern, []),
+                    "human": human_examples.get(pattern, []),
+                },
             }
         )
 
@@ -174,6 +192,20 @@ def smart_truncate(text: str, max_len: int = 140) -> str:
     end_window = start_window + max_len
 
     return "..." + text[start_window:end_window] + "..."
+
+
+def pick_examples(item: dict, prefer_source: str, n: int = 2) -> tuple[list, str]:
+    """Pull examples from the preferred source, falling back if empty."""
+    by_source = item["examples_by_source"]
+    pool = by_source.get(prefer_source, [])
+    label = prefer_source
+    if not pool:
+        for fallback in ("human", "gpt", "claude"):
+            if by_source.get(fallback):
+                pool = by_source[fallback]
+                label = fallback
+                break
+    return pool[:n], label
 
 
 def main():
@@ -226,9 +258,14 @@ def main():
                 f.write(f"  -> Claude PMI: {item['claude_pmi']:+.3f}\n")
                 f.write(f"  -> Gap Size:   {item['model_gap']:.3f}\n")
 
-                for i, ex in enumerate(item["examples"]):
+                gpt_exs, _ = pick_examples(item, "gpt", n=1)
+                claude_exs, _ = pick_examples(item, "claude", n=1)
+                for ex in gpt_exs:
                     highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(f"     ex{i + 1}: {smart_truncate(highlighted, 140)}...\n")
+                    f.write(f"     ex [gpt]: {smart_truncate(highlighted, 140)}\n")
+                for ex in claude_exs:
+                    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
+                    f.write(f"     ex [claude]: {smart_truncate(highlighted, 140)}\n")
 
             # --- 2. STRONGEST GPT SIGNATURES ---
             gpt_strongest = sorted(
@@ -247,9 +284,15 @@ def main():
                 f.write(f"  -> GPT PMI:    {item['gpt_pmi']:+.3f} (Max Deviation)\n")
                 f.write(f"  -> Claude PMI: {item['claude_pmi']:+.3f}\n")
 
-                for i, ex in enumerate(item["examples"]):
+                examples, source_label = pick_examples(item, "gpt")
+                for i, ex in enumerate(examples):
                     highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(f"     ex{i + 1}: {smart_truncate(highlighted, 140)}...\n")
+                    f.write(
+                        (
+                            f"     ex{i + 1} [{source_label}]: "
+                            f"{smart_truncate(highlighted, 140)}\n"
+                        )
+                    )
 
             # --- 3. STRONGEST CLAUDE SIGNATURES ---
             claude_strongest = sorted(
@@ -268,9 +311,56 @@ def main():
                 f.write(f"  -> Claude PMI: {item['claude_pmi']:+.3f} (Max Deviation)\n")
                 f.write(f"  -> GPT PMI:    {item['gpt_pmi']:+.3f}\n")
 
-                for i, ex in enumerate(item["examples"]):
+                examples, source_label = pick_examples(item, "claude")
+                for i, ex in enumerate(examples):
                     highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(f"     ex{i + 1}: {smart_truncate(highlighted, 140)}...\n")
+                    f.write(
+                        (
+                            f"     ex{i + 1} [{source_label}]: "
+                            f"{smart_truncate(highlighted, 140)}\n"
+                        )
+                    )
+
+            # --- 4. CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES THESE ---
+            categorical_patterns = sorted(
+                [item for item in report if item["categorical"]],
+                key=lambda x: x["model_gap"],
+                reverse=True,
+            )
+
+            f.write(
+                (
+                    f"\n\n### CATEGORICAL PATTERNS: "
+                    f"ONE MODEL NEVER PRODUCES ({domain.upper()})\n"
+                )
+            )
+            f.write("-" * 80 + "\n")
+
+            if not categorical_patterns:
+                f.write("  No categorical absences found.\n")
+            else:
+                for item in categorical_patterns[:6]:
+                    absent = "Claude" if item["claude_count"] == 0 else "GPT"
+                    present = "GPT" if absent == "Claude" else "Claude"
+                    present_count = (
+                        item["gpt_count"] if present == "GPT" else item["claude_count"]
+                    )
+                    f.write(f"\nPattern: {item['pattern']}\n")
+                    f.write(f"  -> {absent} produces this 0 times\n")
+                    f.write(f"  -> {present} produces this {present_count} times\n")
+                    f.write(f"  -> GPT PMI:    {item['gpt_pmi']:+.3f}\n")
+                    f.write(f"  -> Claude PMI: {item['claude_pmi']:+.3f}\n")
+
+                    present_source = present.lower()
+                    examples, source_label = pick_examples(item, present_source)
+                    for i, ex in enumerate(examples):
+                        highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
+                        f.write(
+                            (
+                                f"     ex{i + 1} [{source_label}]: "
+                                f"{smart_truncate(highlighted, 140)}\n"
+                            )
+                        )
 
             domain_time = time.time() - start_time
             f.write(f"\n[ Domain '{domain}' completed in {domain_time:.1f}s ]\n")

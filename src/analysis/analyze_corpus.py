@@ -4,17 +4,14 @@ Analyze a pre-parsed corpus for syntactic motifs.
 Usage:
     python analyze_corpus.py gutenberg_parsed.jsonl --limit 1000
     python analyze_corpus.py gutenberg_parsed.jsonl --author Dickens --min-terminals 3
-    python analyze_corpus.py gutenberg_parsed.jsonl --author Dickens --score pmi --top 50
+    python analyze_corpus.py gutenberg_parsed.jsonl --author Dickens --score pmi --top 5
 """
 
-import argparse
-import json
 import math
-import random
 import re
 from collections import Counter, defaultdict
 
-from mining import count_terminal_nodes, extract_patterns_with_examples
+from mining import extract_patterns_with_examples
 from nltk import Tree
 
 
@@ -58,8 +55,10 @@ def analyze_parsed_corpus(
                 tree, sent_text, max_depth=max_depth, min_terminals=min_terminals
             ):
                 counts[pattern] += 1
-                if len(examples[pattern]) < collect_examples:
-                    if not any(highlighted == ex[0] for ex in examples[pattern]):
+                if (
+                    len(examples[pattern]) < collect_examples
+                ):  # sourcery skip: merge-nested-ifs
+                    if all(highlighted != ex[0] for ex in examples[pattern]):
                         examples[pattern].append((highlighted, sentence))
 
         except Exception as e:

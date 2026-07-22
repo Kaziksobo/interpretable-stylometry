@@ -4,7 +4,6 @@ Subtree pattern extraction and counting.
 Extracts induced subtrees from constituency parse trees and counts their frequencies.
 """
 
-from collections import Counter
 from typing import Iterator
 
 from nltk import Tree
@@ -69,11 +68,6 @@ def _extract_subtree_at_depth(tree: Tree, depth: int) -> Tree | None:
             child_subtree = _extract_subtree_at_depth(child, depth - 1)
             if child_subtree is not None:
                 children.append(child_subtree)
-        else:
-            # Terminal: represent as empty node with POS tag
-            # We skip terminals entirely since we want abstract patterns
-            pass
-
     if not children and depth > 1:
         # This node has no non-terminal children, depth-1 would be empty
         # Still return the node itself
@@ -217,10 +211,14 @@ def extract_patterns_with_examples(
         if not isinstance(t, Tree):
             return
 
+        seen_at_this_node = set()
         for depth in range(min_depth, max_depth + 1):
             subtree = _extract_subtree_at_depth(t, depth)
             if subtree is not None:
                 pattern = canonicalize(subtree)
+                if pattern in seen_at_this_node:
+                    continue
+                seen_at_this_node.add(pattern)
                 terminal_count = count_terminal_nodes(pattern)
                 if terminal_count >= min_terminals:
                     # Get representative terminals for this depth
