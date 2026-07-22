@@ -4,268 +4,426 @@
 ### TOP DIVERGENCE: WHERE GPT AND CLAUDE DISAGREE MOST (REUTER)
 --------------------------------------------------------------------------------
 
-Pattern: (PP (JJ) (IN) (NP))
-  -> GPT PMI:    +1.097
-  -> Claude PMI: -1.550
-  -> Gap Size:   2.647
-     ex1: However, despite this increase in internet usage, online services **such as social media platforms, streaming services, and e-commerce websi......
-     ex2: The survey found that these services are facing challenges **such as increased competition, data privacy concerns, and changing consumer pre......
+Pattern: (VP (VBD) (NP) (NP) (S))
+  -> GPT PMI:    -4.679
+  -> Claude PMI: +2.207
+  -> Gap Size:   6.886
+     ex [gpt]: Legislators **introduced two bills Thursday to overturn the Clinton administration's export limits on computer encryption technology, a key ...
+     ex [claude]: The warning comes after Japan **announced plans this week to build new docks and an environmental monitoring station on the largest island, ...
 
-Pattern: (ADVP (RB) (RBS))
-  -> GPT PMI:    -2.367
-  -> Claude PMI: +0.075
-  -> Gap Size:   2.441
-     ex1: ANZ's denial of the merger rumors may put an end to the speculation, **at least** for now....
-     ex2: The NHTSA has reported **at least** 15 incidents of unprovoked air bag deployment, resulting in two injuries....
+Pattern: (S (VP (VBN) (PP)) (:))
+  -> GPT PMI:    -0.094
+  -> Claude PMI: +6.763
+  -> Gap Size:   6.856
+     ex [gpt]: Continued on next page...
+     ex [claude]: Continued on next page...
 
-Pattern: (PP (IN) (NP (DT) (JJ) (CD) (NNS)))
-  -> GPT PMI:    -2.172
-  -> Claude PMI: +0.215
-  -> Gap Size:   2.387
-     ex1: ...to his Roll right or wrong and Hertz point-to-point wins in the space **of a remarkable four weeks**.......
-     ex2: ...gs for the companies, with estimated synergies of around $7.6 billion **over the next five years**.......
+Pattern: (S (VP (VBN) (PP (IN) (NP))) (:))
+  -> GPT PMI:    -0.094
+  -> Claude PMI: +6.763
+  -> Gap Size:   6.856
+     ex [gpt]: Continued on next page...
+     ex [claude]: Continued on next page...
 
-Pattern: (VP (VBD) (SBAR (S)))
-  -> GPT PMI:    -4.222
-  -> Claude PMI: -1.889
-  -> Gap Size:   2.332
-     ex1: He was advised by his doctors to rest and rehabilitate the injury which **meant he had to withdraw from the upcoming tournament**....
-     ex2: ...garded as one of the best serve-and-volley players of his generation, **said he was pleased with his performance so far in the tournament**.......
+Pattern: (VP (VBD) (NP (CD) (NN)))
+  -> GPT PMI:    -4.001
+  -> Claude PMI: +2.714
+  -> Gap Size:   6.714
+     ex [gpt]: Meanwhile, Constellation Software lost 1.4%, and Kinaxis gave up 1.8%, while Real Matters and CGI Group bucked the trend, surging 2.9% and 1...
+     ex [claude]: The Hungarian BUX index gained over 3% on Monday, while Poland’s WIG20 rose 2.2% and the Czech PX index added 1.3%.
 
 
 ### STRONGEST GPT SIGNATURES: FURTHEST FROM HUMANS (REUTER)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (NN) (,) (NN) (,) (CC) (NN))
-  -> GPT PMI:    +6.491 (Max Deviation)
-  -> Claude PMI: +5.570
-     ex1: “We’re confident the merger will help drive **competition, innovation, and investment** in the UK.”...
-     ex2: ...ting heavily in Ukraine in recent years, particularly in the areas of **agriculture, energy, and infrastructure**.......
+Pattern: (S (NP (DT)) (VP (VBZ) (VP)) (.))
+  -> GPT PMI:    +7.726 (Max Deviation)
+  -> Claude PMI: +4.500
+     ex1 [gpt]: This has made it difficult for companies to comply with regulations while operating on a global scale.
+     ex2 [gpt]: This has created a situation where businesses have to comply with multiple tax codes and deal with different tax authorities.
 
-Pattern: (NP (NNS) (,) (NNS) (,) (CC) (NNS))
-  -> GPT PMI:    +5.491 (Max Deviation)
-  -> Claude PMI: +5.085
-     ex1: This will create new opportunities for **businesses, researchers, and individuals** to innovate, collaborate, and engage with the world....
-     ex2: ...eans that Lear Corp. will be able to offer customers a wider range of **colors, materials, and finishes** for their automotive interiors.......
+Pattern: (S (NP (DT) (NN)) (VP (VBZ) (ADVP) (VP)) (.))
+  -> GPT PMI:    +7.661 (Max Deviation)
+  -> Claude PMI: +4.933
+     ex1 [gpt]: The campaign has also argued that the risks associated with the export of encryption software can be managed and mitigated through careful p...
+     ex2 [gpt]: The tournament has always been popular among players due to its indoor surface, which is suited to the fast game of serve-and-volley.
 
-Pattern: (ADJP (RBR) (JJ) (CC) (JJ))
-  -> GPT PMI:    +4.366 (Max Deviation)
-  -> Claude PMI: +2.500
-     ex1: Companies are also focusing on improving customer experience and offering **more personalized and relevant** content....
-     ex2: ...ng priorities of the technology industry, and underlines the need for **more careful and nuanced** policy discussions around issues of priva......
+Pattern: (S (NP (DT) (NN)) (VP (VBZ) (VP (VBN) (VP))) (.))
+  -> GPT PMI:    +7.521 (Max Deviation)
+  -> Claude PMI: +4.878
+     ex1 [gpt]: The case has been brought before the court by a group of banking institutions who are challenging the decision made by the Commodity Futures...
+     ex2 [gpt]: The bank has been investing heavily in technology, as it seeks to improve its digital services and remain competitive in the fast-changing f...
 
-Pattern: (VP (VBD) (SBAR (S)))
-  -> GPT PMI:    -4.222 (Max Deviation)
-  -> Claude PMI: -1.889
-     ex1: He was advised by his doctors to rest and rehabilitate the injury which **meant he had to withdraw from the upcoming tournament**....
-     ex2: ...garded as one of the best serve-and-volley players of his generation, **said he was pleased with his performance so far in the tournament**.......
+Pattern: (SBAR (S (S) (CC) (S)))
+  -> GPT PMI:    -7.323 (Max Deviation)
+  -> Claude PMI: -1.964
+     ex1 [human]: Macpherson said **Asia was "an exciting part of the world" for investment capital and Singapore had been chosen as it was a good communicati...
+     ex2 [human]: ...min a takeover target for a larger international player, Keswick said **a public company was always in the firing line but he was happy with...
 
 
 ### STRONGEST CLAUDE SIGNATURES: FURTHEST FROM HUMANS (REUTER)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (NN) (,) (NN) (,) (CC) (NN))
-  -> Claude PMI: +5.570 (Max Deviation)
-  -> GPT PMI:    +6.491
-     ex1: “We’re confident the merger will help drive **competition, innovation, and investment** in the UK.”...
-     ex2: ...ting heavily in Ukraine in recent years, particularly in the areas of **agriculture, energy, and infrastructure**.......
+Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S)))
+  -> Claude PMI: +7.444 (Max Deviation)
+  -> GPT PMI:    +2.906
+     ex1 [claude]: ...de group representing many of the world’s largest software companies, **announced today that it is withdrawing its support for the Clinton a...
+     ex2 [claude]: The Clinton administration **announced today that it will revise controversial export rules for sophisticated encryption software and other ...
 
-Pattern: (NP (NNS) (,) (NNS) (,) (CC) (NNS))
-  -> Claude PMI: +5.085 (Max Deviation)
-  -> GPT PMI:    +5.491
-     ex1: This will create new opportunities for **businesses, researchers, and individuals** to innovate, collaborate, and engage with the world....
-     ex2: ...eans that Lear Corp. will be able to offer customers a wider range of **colors, materials, and finishes** for their automotive interiors.......
+Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S (NP) (VP))))
+  -> Claude PMI: +7.426 (Max Deviation)
+  -> GPT PMI:    +2.906
+     ex1 [claude]: ...de group representing many of the world’s largest software companies, **announced today that it is withdrawing its support for the Clinton a...
+     ex2 [claude]: The Clinton administration **announced today that it will revise controversial export rules for sophisticated encryption software and other ...
 
-Pattern: (S (NP (NNS)) (VP (VBP) (SBAR)) (.))
-  -> Claude PMI: +3.701 (Max Deviation)
-  -> GPT PMI:    +3.076
-     ex1: Critics argue that the export of this technology could aid foreign adversaries in developing their own encryption capabilities, making it ha......
-     ex2: Others believe that the changes highlight the ongoing conflict between the need for stability and the desire for growth in the financial sec......
+Pattern: (S (ADVP (RB)) (,) (NP (NNS)) (VP (VBP) (SBAR)) (.))
+  -> Claude PMI: +6.850 (Max Deviation)
+  -> GPT PMI:    +6.154
+     ex1 [claude]: However, others counter that the innovations in the new strategic plan are critical for the USPS to keep up with the rapid pace of change in...
+     ex2 [claude]: However, others warn that continuing to rely on IPv4 risks fragmenting parts of the Internet as some new devices and networks are cut off fr...
 
-Pattern: (NP (NP) (,) (NP) (,) (CC) (NP))
-  -> Claude PMI: +3.608 (Max Deviation)
-  -> GPT PMI:    +3.792
-     ex1: The report highlights various pyramid schemes, including **chain letters, matrix schemes, and recruiting scams**....
-     ex2: The move comes amid growing concerns about **cyber threats, data breaches, and online fraud**....
+Pattern: (S (VP (VBN) (PP)) (:))
+  -> Claude PMI: +6.763 (Max Deviation)
+  -> GPT PMI:    -0.094
+     ex1 [claude]: Continued on next page...
+     ex2 [claude]: Continued on page 23...
 
-[ Domain 'reuter' completed in 25.6s ]
+
+### CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES (REUTER)
+--------------------------------------------------------------------------------
+
+Pattern: (VP (VBD) (NP) (NP) (S))
+  -> GPT produces this 0 times
+  -> Claude produces this 49 times
+  -> GPT PMI:    -4.679
+  -> Claude PMI: +2.207
+     ex1 [claude]: The warning comes after Japan **announced plans this week to build new docks and an environmental monitoring station on the largest island, ...
+     ex2 [claude]: ... Despite Below-Expectation Q1 Performance
+
+Media mogul Rupert Murdoch **issued a statement today predicting a 20 percent increase in net pro...
+
+Pattern: (S (VP (VBN) (PP)) (:))
+  -> GPT produces this 0 times
+  -> Claude produces this 48 times
+  -> GPT PMI:    -0.094
+  -> Claude PMI: +6.763
+     ex1 [claude]: Continued on next page...
+     ex2 [claude]: Continued on page 23...
+
+Pattern: (S (VP (VBN) (PP (IN) (NP))) (:))
+  -> GPT produces this 0 times
+  -> Claude produces this 48 times
+  -> GPT PMI:    -0.094
+  -> Claude PMI: +6.763
+     ex1 [claude]: Continued on next page...
+     ex2 [claude]: Continued on page 23...
+
+Pattern: (NP (NP (NNP)) (,) (NP (CD)) (,))
+  -> GPT produces this 0 times
+  -> Claude produces this 40 times
+  -> GPT PMI:    -4.553
+  -> Claude PMI: +2.040
+     ex1 [claude]: Becker, 42, has been struggling with wrist issues over the past few months and had to pull out of events in Memphis and Delray Beach earlier...
+     ex2 [claude]: Korda, 21, is the son of Ivanisevic's former rival Petr Korda.
+
+Pattern: (S (NP (DT) (NNS)) (VP (VBP) (SBAR (S))) (.))
+  -> GPT produces this 0 times
+  -> Claude produces this 32 times
+  -> GPT PMI:    -0.094
+  -> Claude PMI: +6.178
+     ex1 [claude]: Some analysts say targeting Wang is aimed at intimidating other activists and stifling the democracy movement in China.
+     ex2 [claude]: Some analysts argue the company should diversify further into space and commercial aviation to mitigate its overreliance on military program...
+
+Pattern: (S (NP (DT)) (VP (VBZ) (VP (VBN) (PP))) (.))
+  -> Claude produces this 0 times
+  -> GPT produces this 42 times
+  -> GPT PMI:    +6.298
+  -> Claude PMI: +0.178
+     ex1 [gpt]: This has led to an increased interest in pensions and the need for more transparent and flexible pension products.
+     ex2 [gpt]: This has led to increased competition among banks for a smaller pool of borrowers.
+
+[ Domain 'reuter' completed in 15.4s ]
 
 
 ### TOP DIVERGENCE: WHERE GPT AND CLAUDE DISAGREE MOST (WP)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (NP) (,) (NP) (,) (CC) (NP))
-  -> GPT PMI:    +2.965
-  -> Claude PMI: +0.501
-  -> Gap Size:   2.464
-     ex1: He obsessed over **quantum physics, the nature of reality, and the possibility of parallel universes**....
-     ex2: ...gether, they would continue to navigate life's challenges, armed with **love, understanding, and the transformative power of redemption**.......
+Pattern: (S (NP (NNP)) (VP (VBD)) (.))
+  -> GPT PMI:    -6.381
+  -> Claude PMI: +1.075
+  -> Gap Size:   7.456
+     ex [gpt]: Uriel continued.
+     ex [claude]: Jenny sighed.
 
-Pattern: (S (VP (VBG) (NP (NP) (SBAR))))
-  -> GPT PMI:    +2.985
-  -> Claude PMI: +0.620
-  -> Gap Size:   2.366
-     ex1: Each passing generation treasured the delicate balance between life and death, **cherishing the moments they shared together**....
-     ex2: The scientific veneer that had shielded him began to crack, **revealing a dimension where his mind traversed an abyss of insanity**....
-
-Pattern: (VP (VBN) (S (NP)))
-  -> GPT PMI:    +2.596
+Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
+  -> GPT PMI:    +7.359
   -> Claude PMI: +0.427
-  -> Gap Size:   2.169
-     ex1: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist **named Dr. Alexander Barnes**....
-     ex2: Once upon a time, in the quiet town of Willowbrook, there lived a remarkable guardian angel **named Seraphina**....
+  -> Gap Size:   6.932
+     ex [gpt]: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
+     ex [claude]: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
 
-Pattern: (S (S) (,) (NP) (VP) (.))
-  -> GPT PMI:    +2.139
-  -> Claude PMI: +0.012
-  -> Gap Size:   2.127
-     ex1: Consumed with a voracious curiosity, he performed a ground-breaking experiment on himself, and soon found himself cured of the shackles of m......
-     ex2: Bewildered yet intrigued, Dr. Barnes decided to make the call the following day....
+Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) (.))
+  -> GPT PMI:    +7.198
+  -> Claude PMI: +0.427
+  -> Gap Size:   6.771
+     ex [gpt]: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
+     ex [claude]: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
+
+Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
+  -> GPT PMI:    +6.918
+  -> Claude PMI: +0.427
+  -> Gap Size:   6.491
+     ex [gpt]: Instead, she imparted the importance of honesty and integrity, emphasizing the impact of one's actions on others.
+     ex [claude]: Instead, she imparted the importance of honesty and integrity, emphasizing the impact of one's actions on others.
 
 
 ### STRONGEST GPT SIGNATURES: FURTHEST FROM HUMANS (WP)
 --------------------------------------------------------------------------------
 
-Pattern: (VP (VBD) (S (VP)) (,) (S (VP)))
-  -> GPT PMI:    +3.613 (Max Deviation)
-  -> Claude PMI: +1.749
-     ex1: The scientific veneer that had shielded him **began to crack, revealing a dimension where his mind traversed an abyss of insanity**....
-     ex2: Throughout the day, Sarah **continued to engage with family members, offering a listening ear and sharing insightful wisdom**....
+Pattern: (VP (VBD) (NP (NP (DT) (JJ) (NN)) (VP (VBN) (S))))
+  -> GPT PMI:    +7.526 (Max Deviation)
+  -> Claude PMI: +2.427
+     ex1 [gpt]: Once upon a time in a small college town, there **lived a carefree student named Jake**.
+     ex2 [gpt]: Once upon a time, in a small town nestled by the sea, there **lived a young man named Lucas**.
 
-Pattern: (NP (NP (DT) (NN)) (PP (IN) (NP (NN) (CC) (NN))))
-  -> GPT PMI:    +3.565 (Max Deviation)
-  -> Claude PMI: +1.957
-     ex1: Finally, as the last of the vile invaders fled, Crestwood was left in **a state of awe and disbelief**....
-     ex2: This revelation hit her hard, disheartening Sarah as she had considered him **the epitome of strength and wisdom**....
+Pattern: (VP (VBD) (VP (VBN) (NP) (,) (S)))
+  -> GPT PMI:    +7.492 (Max Deviation)
+  -> Claude PMI: +5.012
+     ex1 [gpt]: ...thing had been permissible until the age of eighteen, Amelia and Jack **had defied the odds, perhaps fulfilling the dreams of children every...
+     ex2 [gpt]: The note in my trembling hands **had arrived this morning, cryptically commanding my presence at an undisclosed location by 23:00**.
 
-Pattern: (S (PP (IN) (NP)) (,) (NP (PRP)) (VP (VBD) (NP)) (.))
-  -> GPT PMI:    +3.480 (Max Deviation)
-  -> Claude PMI: +2.514
-     ex1: Despite their differences, she recognized the shared determination to protect the innocent....
-     ex2: Through an intricate web of coded messages and secret meetings, we discovered a hidden organization responsible for this trial....
+Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
+  -> GPT PMI:    +7.359 (Max Deviation)
+  -> Claude PMI: +0.427
+     ex1 [gpt]: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
+     ex2 [gpt]: Fighting a battle within her heart, Emily decided to give the mysterious figure a chance.
 
-Pattern: (VP (VBD) (S) (,) (S))
-  -> GPT PMI:    +3.394 (Max Deviation)
-  -> Claude PMI: +1.564
-     ex1: The scientific veneer that had shielded him **began to crack, revealing a dimension where his mind traversed an abyss of insanity**....
-     ex2: Though uncertain about how to address his actions, Sarah **decided to observe carefully, unsure if she should expose his secret**....
+Pattern: (SBAR (IN) (S (NP (NNS)) (VP (VBD) (PP))))
+  -> GPT PMI:    +7.359 (Max Deviation)
+  -> Claude PMI: +5.012
+     ex1 [gpt]: Panicked screams echoed through the streets **as people scattered in every direction**.
+     ex2 [gpt]: **As fortunes fluctuated on the screen**, cheers and gasps filled the night air.
 
 
 ### STRONGEST CLAUDE SIGNATURES: FURTHEST FROM HUMANS (WP)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (PRP$) (JJ) (NN) (CC) (NN))
-  -> Claude PMI: +3.012 (Max Deviation)
-  -> GPT PMI:    +3.111
-     ex1: Embracing **his newfound wisdom and compassion**, Jake continued his journey through life, sharing the gift of happiness wherever he went....
-     ex2: Time stood still as William nervously approached the clinic, haunted by the impending doom tied to **his own flesh and blood**....
+Pattern: (NP (NP (NNP) (POS)) (NN) (CC) (NN))
+  -> Claude PMI: +5.597 (Max Deviation)
+  -> GPT PMI:    +5.433
+     ex1 [claude]: Maggie found **Mark's enthusiasm and humor** irresistible.
+     ex2 [claude]: The story's climax comes when Clara realizes the depth of **Gerald's deception and manipulation**.
 
-Pattern: (VP (VBD) (PP (IN) (NP)) (,) (S (NP) (VP)))
-  -> Claude PMI: +2.963 (Max Deviation)
-  -> GPT PMI:    +3.291
-     ex1: True to his word, Death **appeared on Dr. Barnes' doorstep, an inquisitive smile gracing his skeletal face**....
-     ex2: Gathering her courage, Emma **climbed into the alien craft, intuition guiding her**....
+Pattern: (S (NP (DT) (JJ) (NN)) (VP (VBD) (PP) (,) (S)) (.))
+  -> Claude PMI: +5.577 (Max Deviation)
+  -> GPT PMI:    +3.985
+     ex1 [claude]: The old warehouse lurked at the end of the abandoned street, holding untold secrets behind its rusty metal door.
+     ex2 [claude]: The old warehouse loomed over the pier, creaking in the cold wind sweeping in from the bay.
 
-Pattern: (S (NP (PRP)) (VP (VBD) (PP) (,) (S)) (.))
-  -> Claude PMI: +2.564 (Max Deviation)
-  -> GPT PMI:    +2.489
-     ex1: He traveled through ethereal landscapes, interacting with lost souls, each with their own unique narrative....
-     ex2: We sat in a contented silence, basking in the afterglow of a night well spent, our hearts overflowing with love and acceptance....
+Pattern: (S (NP (PRP$) (PRP$) (NN)) (VP (VBD) (SBAR (IN) (S))) (.))
+  -> Claude PMI: +5.514 (Max Deviation)
+  -> GPT PMI:    +2.526
+     ex1 [claude]: My mind raced as I tried to make sense of what was happening.
+     ex2 [claude]: My heart dropped as I realized what was happening.
 
-Pattern: (S (PP (IN) (NP)) (,) (NP (PRP)) (VP (VBD) (NP)) (.))
-  -> Claude PMI: +2.514 (Max Deviation)
-  -> GPT PMI:    +3.480
-     ex1: Despite their differences, she recognized the shared determination to protect the innocent....
-     ex2: Through an intricate web of coded messages and secret meetings, we discovered a hidden organization responsible for this trial....
+Pattern: (S (NP (DT) (NNS)) (VP (VBD) (PP) (,) (S)) (.))
+  -> Claude PMI: +5.334 (Max Deviation)
+  -> GPT PMI:    +6.433
+     ex1 [claude]: The invaders stared in shock, realizing their advanced weapons were useless against the primordial power of the spear.
+     ex2 [claude]: The toddlers shrieked with glee, swarming around Satan's cloven hooves as he passed out cups of milk and platters of worm jerky.
 
-[ Domain 'wp' completed in 28.8s ]
+
+### CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES (WP)
+--------------------------------------------------------------------------------
+
+Pattern: (S (NP (NNP)) (VP (VBD)) (.))
+  -> GPT produces this 0 times
+  -> Claude produces this 94 times
+  -> GPT PMI:    -6.381
+  -> Claude PMI: +1.075
+     ex1 [claude]: Jenny sighed.
+     ex2 [claude]: Maeve laughed.
+
+Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
+  -> Claude produces this 0 times
+  -> GPT produces this 57 times
+  -> GPT PMI:    +7.359
+  -> Claude PMI: +0.427
+     ex1 [gpt]: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
+     ex2 [gpt]: Fighting a battle within her heart, Emily decided to give the mysterious figure a chance.
+
+Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) (.))
+  -> Claude produces this 0 times
+  -> GPT produces this 51 times
+  -> GPT PMI:    +7.198
+  -> Claude PMI: +0.427
+     ex1 [gpt]: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
+     ex2 [gpt]: Once upon a time, in a small town nestled by the sea, there lived a young man named Lucas.
+
+Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
+  -> Claude produces this 0 times
+  -> GPT produces this 42 times
+  -> GPT PMI:    +6.918
+  -> Claude PMI: +0.427
+     ex1 [gpt]: Instead, she imparted the importance of honesty and integrity, emphasizing the impact of one's actions on others.
+     ex2 [gpt]: Tentatively, she approached the enigmatic creature, her wings trembling slightly.
+
+Pattern: (VP (VB) (CC) (VP (VB) (NP (NP) (PP))))
+  -> Claude produces this 0 times
+  -> GPT produces this 36 times
+  -> GPT PMI:    +6.696
+  -> Claude PMI: +0.427
+     ex1 [gpt]: Shocked, Sarah couldn't **help but feel a pang of disappointment**.
+     ex2 [gpt]: As the genie vanished back into the bong, Jake couldn't **help but feel an overwhelming sense of fulfillment**.
+
+Pattern: (NP (RB) (DT) (ADJP) (NNS))
+  -> Claude produces this 0 times
+  -> GPT produces this 34 times
+  -> GPT PMI:    +4.613
+  -> Claude PMI: -1.573
+     ex1 [gpt]: He made **even the most mundane statements** sound like groundbreaking news.
+     ex2 [gpt]: ...ot set in stone, and the power of love and perseverance could rewrite **even the most ominous prophecies**....
+
+[ Domain 'wp' completed in 15.8s ]
 
 
 ### TOP DIVERGENCE: WHERE GPT AND CLAUDE DISAGREE MOST (ESSAY)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (DT) (JJ) (,) (JJ) (NN))
-  -> GPT PMI:    -0.551
-  -> Claude PMI: +2.170
-  -> Gap Size:   2.722
-     ex1: Their music was characterized by prominent guitar riffs, a driving rhythm section, and **a raw, gritty feel**....
-     ex2: ...research, dialogue, and comprehensive analysis are necessary to shape **an equitable, nuanced approach** that acknowledges the multifaceted ......
+Pattern: (S (CC) (NP) (VP) (.))
+  -> GPT PMI:    -4.681
+  -> Claude PMI: +3.055
+  -> Gap Size:   7.735
+     ex [gpt]: And other conversations about race is the author’s sincere monolog about injustice, which provides insight into its grounds, effects, and ap...
+     ex [claude]: And encrypted e-commerce transactions keep payment information private.
 
-Pattern: (CONJP (RB) (RB))
-  -> GPT PMI:    +1.370
-  -> Claude PMI: -1.267
-  -> Gap Size:   2.637
-     ex1: This deliberate misinformation **not only** deceived investors but also misled employees and other stakeholders....
-     ex2: **Not only** does it damage the company's reputation, but it also leads to employee dissatisfaction and a negative work culture....
+Pattern: (NP (LST) (NP) (:))
+  -> GPT PMI:    +6.756
+  -> Claude PMI: -0.530
+  -> Gap Size:   7.286
+     ex [gpt]: a. Physical and Psychological Abuse:
+     ex [claude]: * Deviance:
 
-Pattern: (NP (CD) (JJ) (NN))
-  -> GPT PMI:    +1.364
-  -> Claude PMI: -1.016
-  -> Gap Size:   2.379
-     ex1: **One critical aspect** of effective communication is the dissemination of accurate and timely information....
-     ex2: **One such case** is that of Etihad Airways, where the company displayed a complete disregard for corporate social responsibility and discri......
+Pattern: (NP (LST) (NP))
+  -> GPT PMI:    +4.467
+  -> Claude PMI: -2.530
+  -> Gap Size:   6.997
+     ex [gpt]: **B. Implicit Biases and Stereotypes**:
+   1. Black women often face stereotypes, resulting in judgement, undervaluation of their pain, lack...
+     ex [claude]: **4. Printer** – Laser printer of at least 600 DPI qualities for near letter quality printing of reports.
+ 5.
 
-Pattern: (CONJP (CC) (RB))
-  -> GPT PMI:    +1.383
-  -> Claude PMI: -0.893
-  -> Gap Size:   2.276
-     ex1: This deliberate misinformation not only deceived investors **but also** misled employees and other stakeholders....
-     ex2: ...n of technology into the fashion industry not only benefits customers **but also** offers opportunities for designers and retailers.......
+Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
+  -> GPT PMI:    -4.333
+  -> Claude PMI: +2.654
+  -> Gap Size:   6.987
+     ex [gpt]: However, at the same time, **cultural, social and economic** foundations were laid for further development as independent States.
+     ex [claude]: The striking bronze figures, their victory immortalized in stone, appear **strong, determined and heroic**.
 
 
 ### STRONGEST GPT SIGNATURES: FURTHEST FROM HUMANS (ESSAY)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (NNP) (CC) (NNP) (.))
-  -> GPT PMI:    -3.882 (Max Deviation)
-  -> Claude PMI: -4.539
-     ex1: A study conducted by Beach et al. (2005) showed that culturally competent care significantly improved patient satisfaction and trust in heal......
-     ex2: On the other hand, Cajiita et al. (2017) examined the efficacy of mHealth interventions in improving healthcare access for minority groups....
+Pattern: (NP (NP) (PRN))
+  -> GPT PMI:    -8.697 (Max Deviation)
+  -> Claude PMI: -5.106
+     ex1 [gpt]: Studies have consistently found that the cost-effectiveness of preventive interventions is often underestimated, leading to the underutiliza...
+     ex2 [gpt]: In a series of studies, APA found that individuals who were able to stay calm and composed during disasters reported higher levels of prepar...
 
-Pattern: (NP (NP) (,) (NP))
-  -> GPT PMI:    -3.158 (Max Deviation)
-  -> Claude PMI: -2.536
-     ex1: Through her work, Greene calls for **a paradigm shift in psychology, one that recognizes and values the unique contributions of individuals ......
-     ex2: Moreover, the philosophical dialogue in the Bhagavad Gita explores **the human condition, particularly the nature of desire, attachment, and......
+Pattern: (PRN (-LRB-) (NP (NP) (,) (NP)) (-RRB-))
+  -> GPT PMI:    -7.833 (Max Deviation)
+  -> Claude PMI: -5.320
+     ex1 [gpt]: Studies have consistently found that the cost-effectiveness of preventive interventions is often underestimated, leading to the underutiliza...
+     ex2 [gpt]: The integration of patient perspectives has been found to improve clinical outcomes, patient satisfaction, and overall healthcare quality (E...
 
-Pattern: (NP (NP (NN) (NN)) (CC) (NP (JJ) (NN)))
-  -> GPT PMI:    +3.065 (Max Deviation)
-  -> Claude PMI: +2.055
-     ex1: ...nformed decisions concerning medical cannabis usage, thereby ensuring **patient welfare and public safety**.......
-     ex2: ... effectively treat Robert's OCD during the pandemic, a combination of **behavior therapy and pharmacological treatment** may be beneficial.......
-
-Pattern: (NP (VBG) (NN) (NNS))
-  -> GPT PMI:    +2.934 (Max Deviation)
+Pattern: (NP (NP) (PP) (:))
+  -> GPT PMI:    +7.536 (Max Deviation)
   -> Claude PMI: +1.470
-     ex1: Greene argues that therapy should not perpetuate **existing power imbalances** but instead should strive for empowerment and social justice....
-     ex2: This could involve reallocating funds from other projects or departments or drawing from **existing cash reserves**....
+     ex1 [gpt]: Potential Benefits of Legalization:
+     ex2 [gpt]: Importance of Care Coordination in Healthcare:
+
+Pattern: (S (PP (IN) (S)) (,) (NP (NN) (NNS)) (VP (MD) (VP)) (.))
+  -> GPT PMI:    +7.297 (Max Deviation)
+  -> Claude PMI: +3.055
+     ex1 [gpt]: By adhering to these principles, healthcare facilities can ensure that they provide the best possible care to their patients while creating ...
+     ex2 [gpt]: By involving patients in decision-making processes and treatment planning, healthcare providers can help them understand the rationale behin...
 
 
 ### STRONGEST CLAUDE SIGNATURES: FURTHEST FROM HUMANS (ESSAY)
 --------------------------------------------------------------------------------
 
-Pattern: (NP (NNP) (CC) (NNP) (.))
-  -> Claude PMI: -4.539 (Max Deviation)
-  -> GPT PMI:    -3.882
-     ex1: A study conducted by Beach et al. (2005) showed that culturally competent care significantly improved patient satisfaction and trust in heal......
-     ex2: On the other hand, Cajiita et al. (2017) examined the efficacy of mHealth interventions in improving healthcare access for minority groups....
+Pattern: (S (NP (NP)) (VP (VBZ) (ADJP) (S)) (.))
+  -> Claude PMI: -6.473 (Max Deviation)
+  -> GPT PMI:    -0.308
+     ex1 [claude]: It is important to avoid technical jargon and check that the key messages are understood.
 
-Pattern: (NML (JJR) (HYPH) (NN))
-  -> Claude PMI: +2.792 (Max Deviation)
-  -> GPT PMI:    +2.586
-     ex1: ...al structure, where decisions are made at the top and trickle down to **lower-level** employees.......
-     ex2: ... influences human behavior, thereby impacting the quality of life for **lower-class** individuals.......
+Pattern: (S (NP (NP (PRP))) (VP (VBZ) (ADJP (JJ)) (S (VP))) (.))
+  -> Claude PMI: -6.363 (Max Deviation)
+  -> GPT PMI:    -0.214
+     ex1 [claude]: It is important to avoid technical jargon and check that the key messages are understood.
 
-Pattern: (NP (DT) (NML (NNP) (HYPH) (NNP)) (NN))
-  -> Claude PMI: +2.792 (Max Deviation)
-  -> GPT PMI:    +2.712
-     ex1: **The Diels-Alder reaction** is a fundamental organic chemical reaction that has revolutionized the field of chemistry....
-     ex2: This essay will discuss the historical significance of **the Diels-Alder reaction**, its applications in chemical processes, and the procedu......
+Pattern: (NP (DT) (NP) (CONJP) (NP))
+  -> Claude PMI: +6.114 (Max Deviation)
+  -> GPT PMI:    +0.127
+     ex1 [claude]: ...nts in other regions and cities, which allowed for the circulation of **both local goods as well as imported luxuries and spices**....
+     ex2 [claude]: ...nd well-intentioned, this period of increased welfare spending led to **both clear successes as well as notable shortcomings**....
 
-Pattern: (NP (JJR) (NN) (CC) (NN))
-  -> Claude PMI: +2.692 (Max Deviation)
-  -> GPT PMI:    +1.349
-     ex1: ...de in the nuclear industry, ranging from improved safety protocols to **greater openness and transparency**.......
-     ex2: ...y increased the number of women entering nursing but also facilitated **greater respect and recognition** for nurses in society.......
+Pattern: (S (ADVP (RB)) (,) (NP (NP (PRP))) (VP (VBZ) (ADJP (JJ)) (S (VP))) (.))
+  -> Claude PMI: -5.990 (Max Deviation)
+  -> GPT PMI:    +0.755
+     ex1 [claude]: However, it is difficult to determine what counts as a puzzle or paradigm shift.
 
-[ Domain 'essay' completed in 30.6s ]
+
+### CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES (ESSAY)
+--------------------------------------------------------------------------------
+
+Pattern: (S (CC) (NP) (VP) (.))
+  -> GPT produces this 0 times
+  -> Claude produces this 84 times
+  -> GPT PMI:    -4.681
+  -> Claude PMI: +3.055
+     ex1 [claude]: And encrypted e-commerce transactions keep payment information private.
+     ex2 [claude]: But we can never reach certainty no matter how many observations we have.
+
+Pattern: (NP (LST) (NP) (:))
+  -> Claude produces this 0 times
+  -> GPT produces this 99 times
+  -> GPT PMI:    +6.756
+  -> Claude PMI: -0.530
+     ex1 [gpt]: a. Physical and Psychological Abuse:
+     ex2 [gpt]: a. Solomon Northup:
+
+Pattern: (NP (LST) (NP))
+  -> Claude produces this 0 times
+  -> GPT produces this 81 times
+  -> GPT PMI:    +4.467
+  -> Claude PMI: -2.530
+     ex1 [gpt]: **B. Implicit Biases and Stereotypes**:
+   1. Black women often face stereotypes, resulting in judgement, undervaluation of their pain, lack...
+     ex2 [gpt]: II. Proposed Solutions for Improving Maternal Health and Women's Possibilities (600 words)
+
+Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
+  -> GPT produces this 0 times
+  -> Claude produces this 50 times
+  -> GPT PMI:    -4.333
+  -> Claude PMI: +2.654
+     ex1 [claude]: The striking bronze figures, their victory immortalized in stone, appear **strong, determined and heroic**.
+     ex2 [claude]: ...posal of high-level radioactive waste requires overcoming substantial **scientific, social and political** challenges that have hampered pro...
+
+Pattern: (NP (NP) (,) (NP) (,) (NP) (CC) (NP))
+  -> GPT produces this 0 times
+  -> Claude produces this 41 times
+  -> GPT PMI:    -4.333
+  -> Claude PMI: +2.368
+     ex1 [claude]: ... of healthcare is especially problematic for marginalized groups like **immigrants, ethnic minorities, disabled individuals or those living ...
+     ex2 [claude]: ... born and remain free and equal in rights" and that these rights are "**liberty, property, security and resistance to oppression**."...
+
+Pattern: (S (NP (EX)) (VP (VBD) (NP)) (.))
+  -> GPT produces this 0 times
+  -> Claude produces this 37 times
+  -> GPT PMI:    -4.195
+  -> Claude PMI: +2.357
+     ex1 [claude]: There were a range of views on how imperialism related to liberalism.
+     ex2 [claude]: There were several reasons why large numbers of women were accused of witchcraft in sixteenth and seventeenth century England.
+
+[ Domain 'essay' completed in 16.3s ]
