@@ -1,0 +1,200 @@
+=== RQ1 SIGNIFICANCE TESTING: FENG ET AL. FEATURES ===
+
+Total tests run: 48
+Significant on DISPERSION (Brown-Forsythe, FDR q<0.05): 33/48
+Significant on LOCATION (Mann-Whitney, FDR q<0.05): 42/48
+
+======================================================================
+DISPERSION RESULTS (primary RQ1 test)
+var_ratio = human variance / AI variance
+  > 1  human more variable than AI  (supports RQ1)
+  < 1  AI more variable than human  (contradicts RQ1)
+======================================================================
+
+[WP] Sentence type: OTHER | human_vs_gpt
+  human : mean=0.139  std=0.101  (n=1000)
+  AI    : mean=0.026  std=0.051  (n=1000)
+  var_ratio=3.88x  p_disp=1.87e-72  p_disp_fdr=8.98e-71  p_loc_fdr=1.58e-185
+
+[WP] Sentence structure: OTHER | human_vs_gpt
+  human : mean=0.410  std=0.163  (n=1000)
+  AI    : mean=0.201  std=0.100  (n=1000)
+  var_ratio=2.67x  p_disp=1.34e-40  p_disp_fdr=3.22e-39  p_loc_fdr=1.60e-170
+
+[REUTER] Sentence type: COMPLEX-COMPOUND | human_vs_claude
+  human : mean=0.158  std=0.101  (n=1007)
+  AI    : mean=0.053  std=0.056  (n=1018)
+  var_ratio=3.19x  p_disp=4.36e-40  p_disp_fdr=6.98e-39  p_loc_fdr=5.12e-146
+
+[WP] Sentence type: COMPLEX-COMPOUND | human_vs_claude
+  human : mean=0.101  std=0.095  (n=1000)
+  AI    : mean=0.036  std=0.052  (n=1000)
+  var_ratio=3.38x  p_disp=1.25e-36  p_disp_fdr=1.50e-35  p_loc_fdr=7.80e-93
+
+[REUTER] Sentence type: COMPOUND | human_vs_gpt
+  human : mean=0.145  std=0.104  (n=1007)
+  AI    : mean=0.063  std=0.064  (n=1018)
+  var_ratio=2.64x  p_disp=1.41e-32  p_disp_fdr=1.36e-31  p_loc_fdr=8.73e-89
+
+[REUTER] Sentence type: COMPLEX-COMPOUND | human_vs_gpt
+  human : mean=0.158  std=0.101  (n=1007)
+  AI    : mean=0.062  std=0.065  (n=1018)
+  var_ratio=2.37x  p_disp=1.44e-26  p_disp_fdr=1.15e-25  p_loc_fdr=1.27e-123
+
+[ESSAY] Sentence type: COMPLEX-COMPOUND | human_vs_gpt
+  human : mean=0.055  std=0.062  (n=993)
+  AI    : mean=0.027  std=0.037  (n=998)
+  var_ratio=2.75x  p_disp=1.40e-25  p_disp_fdr=9.57e-25  p_loc_fdr=6.36e-29
+
+[REUTER] Sentence type: COMPOUND | human_vs_claude
+  human : mean=0.145  std=0.104  (n=1007)
+  AI    : mean=0.081  std=0.069  (n=1018)
+  var_ratio=2.30x  p_disp=1.98e-23  p_disp_fdr=1.19e-22  p_loc_fdr=5.76e-51
+
+[WP] Sentence type: OTHER | human_vs_claude
+  human : mean=0.139  std=0.101  (n=1000)
+  AI    : mean=0.076  std=0.067  (n=1000)
+  var_ratio=2.30x  p_disp=1.41e-22  p_disp_fdr=7.51e-22  p_loc_fdr=2.80e-54
+
+[WP] Sentence type: COMPLEX-COMPOUND | human_vs_gpt
+  human : mean=0.101  std=0.095  (n=1000)
+  AI    : mean=0.059  std=0.054  (n=1000)
+  var_ratio=3.08x  p_disp=9.57e-20  p_disp_fdr=4.59e-19  p_loc_fdr=3.10e-28
+
+[REUTER] Sentence structure: PERIODIC | human_vs_claude
+  human : mean=0.374  std=0.148  (n=1007)
+  AI    : mean=0.214  std=0.109  (n=1018)
+  var_ratio=1.86x  p_disp=5.94e-18  p_disp_fdr=2.59e-17  p_loc_fdr=4.26e-128
+
+[WP] Sentence structure: PERIODIC | human_vs_claude
+  human : mean=0.292  std=0.142  (n=1000)
+  AI    : mean=0.220  std=0.109  (n=1000)
+  var_ratio=1.70x  p_disp=9.00e-15  p_disp_fdr=3.60e-14  p_loc_fdr=5.90e-40
+
+[ESSAY] Sentence type: OTHER | human_vs_claude
+  human : mean=0.029  std=0.061  (n=993)
+  AI    : mean=0.012  std=0.037  (n=1000)
+  var_ratio=2.67x  p_disp=8.29e-14  p_disp_fdr=3.06e-13  p_loc_fdr=6.64e-18
+
+[REUTER] Sentence structure: PERIODIC | human_vs_gpt
+  human : mean=0.374  std=0.148  (n=1007)
+  AI    : mean=0.230  std=0.122  (n=1018)
+  var_ratio=1.49x  p_disp=6.80e-08  p_disp_fdr=2.33e-07  p_loc_fdr=1.69e-101
+
+[ESSAY] Sentence type: COMPLEX-COMPOUND | human_vs_claude
+  human : mean=0.055  std=0.062  (n=993)
+  AI    : mean=0.036  std=0.049  (n=1000)
+  var_ratio=1.62x  p_disp=2.47e-07  p_disp_fdr=7.92e-07  p_loc_fdr=1.86e-16
+
+[WP] Sentence type: SIMPLE | human_vs_gpt
+  human : mean=0.402  std=0.141  (n=1000)
+  AI    : mean=0.407  std=0.119  (n=1000)
+  var_ratio=1.40x  p_disp=3.02e-07  p_disp_fdr=9.07e-07  p_loc_fdr=7.97e-01
+  *** PURE REGULARISATION: spread differs, average rate does not ***
+
+[REUTER] Sentence type: SIMPLE | human_vs_gpt
+  human : mean=0.275  std=0.137  (n=1007)
+  AI    : mean=0.394  std=0.161  (n=1018)
+  var_ratio=0.72x  p_disp=1.79e-06  p_disp_fdr=5.07e-06  p_loc_fdr=2.78e-65
+
+[WP] Sentence structure: OTHER | human_vs_claude
+  human : mean=0.410  std=0.163  (n=1000)
+  AI    : mean=0.398  std=0.137  (n=1000)
+  var_ratio=1.42x  p_disp=3.23e-06  p_disp_fdr=8.62e-06  p_loc_fdr=4.17e-02
+
+[WP] Sentence structure: PERIODIC | human_vs_gpt
+  human : mean=0.292  std=0.142  (n=1000)
+  AI    : mean=0.340  std=0.116  (n=1000)
+  var_ratio=1.50x  p_disp=7.27e-06  p_disp_fdr=1.84e-05  p_loc_fdr=8.71e-27
+
+[REUTER] Sentence type: SIMPLE | human_vs_claude
+  human : mean=0.275  std=0.137  (n=1007)
+  AI    : mean=0.455  std=0.157  (n=1018)
+  var_ratio=0.76x  p_disp=1.03e-05  p_disp_fdr=2.46e-05  p_loc_fdr=2.27e-129
+
+[ESSAY] Sentence type: OTHER | human_vs_gpt
+  human : mean=0.029  std=0.061  (n=993)
+  AI    : mean=0.043  std=0.092  (n=998)
+  var_ratio=0.44x  p_disp=3.31e-05  p_disp_fdr=7.57e-05  p_loc_fdr=4.58e-01
+  *** PURE REGULARISATION: spread differs, average rate does not ***
+
+[ESSAY] Sentence type: COMPLEX | human_vs_gpt
+  human : mean=0.450  std=0.162  (n=993)
+  AI    : mean=0.320  std=0.141  (n=998)
+  var_ratio=1.32x  p_disp=3.36e-04  p_disp_fdr=7.33e-04  p_loc_fdr=3.03e-71
+
+[REUTER] Sentence structure: OTHER | human_vs_claude
+  human : mean=0.190  std=0.131  (n=1007)
+  AI    : mean=0.265  std=0.158  (n=1018)
+  var_ratio=0.68x  p_disp=3.81e-04  p_disp_fdr=7.96e-04  p_loc_fdr=9.22e-35
+
+[ESSAY] Sentence type: COMPOUND | human_vs_claude
+  human : mean=0.072  std=0.069  (n=993)
+  AI    : mean=0.052  std=0.059  (n=1000)
+  var_ratio=1.39x  p_disp=7.44e-04  p_disp_fdr=1.43e-03  p_loc_fdr=9.15e-14
+
+[WP] Sentence type: COMPOUND | human_vs_gpt
+  human : mean=0.110  std=0.073  (n=1000)
+  AI    : mean=0.130  std=0.088  (n=1000)
+  var_ratio=0.68x  p_disp=7.26e-04  p_disp_fdr=1.43e-03  p_loc_fdr=1.88e-07
+
+[WP] Sentence type: SIMPLE | human_vs_claude
+  human : mean=0.402  std=0.141  (n=1000)
+  AI    : mean=0.521  std=0.128  (n=1000)
+  var_ratio=1.21x  p_disp=7.89e-04  p_disp_fdr=1.46e-03  p_loc_fdr=2.53e-79
+
+[ESSAY] Sentence structure: PERIODIC | human_vs_claude
+  human : mean=0.249  std=0.132  (n=993)
+  AI    : mean=0.222  std=0.119  (n=1000)
+  var_ratio=1.24x  p_disp=3.40e-03  p_disp_fdr=6.05e-03  p_loc_fdr=5.50e-06
+
+[WP] Sentence structure: LOOSE | human_vs_claude
+  human : mean=0.299  std=0.110  (n=1000)
+  AI    : mean=0.383  std=0.121  (n=1000)
+  var_ratio=0.83x  p_disp=3.60e-03  p_disp_fdr=6.17e-03  p_loc_fdr=8.78e-58
+
+[ESSAY] Sentence structure: LOOSE | human_vs_gpt
+  human : mean=0.498  std=0.147  (n=993)
+  AI    : mean=0.481  std=0.134  (n=998)
+  var_ratio=1.21x  p_disp=4.52e-03  p_disp_fdr=7.49e-03  p_loc_fdr=3.94e-02
+
+[WP] Sentence structure: LOOSE | human_vs_gpt
+  human : mean=0.299  std=0.110  (n=1000)
+  AI    : mean=0.459  std=0.120  (n=1000)
+  var_ratio=0.84x  p_disp=5.52e-03  p_disp_fdr=8.83e-03  p_loc_fdr=3.09e-157
+
+[REUTER] Sentence type: OTHER | human_vs_claude
+  human : mean=0.021  std=0.083  (n=1007)
+  AI    : mean=0.034  std=0.126  (n=1018)
+  var_ratio=0.43x  p_disp=7.22e-03  p_disp_fdr=1.12e-02  p_loc_fdr=5.57e-03
+
+[ESSAY] Sentence structure: LOOSE | human_vs_claude
+  human : mean=0.498  std=0.147  (n=993)
+  AI    : mean=0.507  std=0.135  (n=1000)
+  var_ratio=1.19x  p_disp=1.25e-02  p_disp_fdr=1.87e-02  p_loc_fdr=1.31e-01
+  *** PURE REGULARISATION: spread differs, average rate does not ***
+
+[REUTER] Sentence type: OTHER | human_vs_gpt
+  human : mean=0.021  std=0.083  (n=1007)
+  AI    : mean=0.032  std=0.133  (n=1018)
+  var_ratio=0.39x  p_disp=1.98e-02  p_disp_fdr=2.87e-02  p_loc_fdr=1.31e-01
+  *** PURE REGULARISATION: spread differs, average rate does not ***
+
+======================================================================
+NON-SIGNIFICANT ON DISPERSION (after FDR correction)
+======================================================================
+  [ESSAY] Sentence structure: OTHER | human_vs_gpt  var_ratio=1.16x  p_disp_fdr=0.200
+  [ESSAY] Sentence type: SIMPLE | human_vs_claude  var_ratio=0.96x  p_disp_fdr=0.207
+  [WP] Sentence type: COMPOUND | human_vs_claude  var_ratio=0.69x  p_disp_fdr=0.277
+  [ESSAY] Sentence structure: OTHER | human_vs_claude  var_ratio=1.12x  p_disp_fdr=0.332
+  [REUTER] Sentence structure: LOOSE | human_vs_claude  var_ratio=0.90x  p_disp_fdr=0.428
+  [ESSAY] Sentence type: COMPLEX | human_vs_claude  var_ratio=1.12x  p_disp_fdr=0.489
+  [WP] Sentence type: COMPLEX | human_vs_claude  var_ratio=1.03x  p_disp_fdr=0.790
+  [REUTER] Sentence type: COMPLEX | human_vs_gpt  var_ratio=0.91x  p_disp_fdr=0.793
+  [WP] Sentence type: COMPLEX | human_vs_gpt  var_ratio=1.03x  p_disp_fdr=0.841
+  [REUTER] Sentence structure: OTHER | human_vs_gpt  var_ratio=0.78x  p_disp_fdr=0.841
+  [ESSAY] Sentence structure: PERIODIC | human_vs_gpt  var_ratio=1.05x  p_disp_fdr=0.875
+  [ESSAY] Sentence type: SIMPLE | human_vs_gpt  var_ratio=1.07x  p_disp_fdr=0.875
+  [ESSAY] Sentence type: COMPOUND | human_vs_gpt  var_ratio=1.01x  p_disp_fdr=0.875
+  [REUTER] Sentence structure: LOOSE | human_vs_gpt  var_ratio=0.90x  p_disp_fdr=0.875
+  [REUTER] Sentence type: COMPLEX | human_vs_claude  var_ratio=0.99x  p_disp_fdr=0.880
