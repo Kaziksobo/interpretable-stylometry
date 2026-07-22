@@ -14,31 +14,65 @@ The analysis is structured around three research questions:
 
 A full literature review motivating these questions is available in `docs/`.
 
+## Current Status
+
+**RQ1 - In progress**. Two parallel analysis tracks are complete:
+
+- **Theory-driven (Feng features)**: Constituency parsing and per-sentence classification of sentence type (SIMPLE/COMPLEX/COMPOUND/COMPLEX-COMPOUND) and structure (LOOSE/PERIODIC) using Feng et al. (2012). Formal dispersion and location testing (Brown-Forsythe, Mann-Whitney U, Benjamini-Hochberg FDR correction) across all three domains and both AI models. Results in `results/rq1_significance.txt`.
+- **Data-driven (syntactic motif mining)**: Bottom-up discovery of discriminatory phrase-structure patterns using induced subtree extraction from constituency parses. PMI-based comparison of GPT and Claude against human baseline, with categorical absence detection. Results in `results/stylometric_report.txt`. Formal dispersion testing on candidate motif patterns is the immediate next step.
+
+**RQ2 - Not yet started**. Dependency parses are available; prosodic feature extraction is pending.
+
+**RQ3 - Not yet started**. Requires construction of base vs instruct Llama corpora.
+
 ## Repository Structure
 
 ```
-interpretable-stylometry/
-├── data/
-│   ├── raw/                  # Original datasets, never modified
-│   │   ├── ghostbuster/      # Verma et al. (2024) — RQ1, RQ2
-│   │   ├── llama-base/       # Self-constructed — RQ3
-│   │   └── llama-instruct/   # Self-constructed — RQ3
-│   └── processed/            # Parsed outputs, feature matrices
-├── docs/
-│   └── litreview.pdf         # Background literature review
-├── notebooks/
-│   ├── rq1/                  # Syntactic feature analysis
-│   ├── rq2/                  # Prosodic feature analysis
-│   └── rq3/                  # Instruction tuning comparison
-├── src/
-│   ├── parsing/              # spaCy parsing pipeline
-│   └── features/
-│       ├── syntactic/        # RQ1 feature extraction
-│       ├── prosodic/         # RQ2 feature extraction
-│       └── posttrain/        # RQ3 feature extraction
-├── results/                  # Figures and output tables
-├── pyproject.toml
-└── README.md
+└── 📁interpretable-stylometry
+    └── 📁data
+        └── 📁processed
+            ├── constituency_features.feather
+            ├── constituency_parses.feather
+            ├── corpus.feather
+            ├── dependency_parses.bak.feather
+            ├── dependency_parses.feather
+            ├── doc_features.feather
+        └── 📁raw
+    └── 📁docs
+        ├── stylometry-litreview.pdf
+    └── 📁notebooks
+        ├── constituency_analysis.ipynb
+        ├── feng_algorithm_dev.ipynb
+        ├── ghostbuster_exploratory_analysis.ipynb
+    └── 📁results
+        ├── ghostbuster_sentence_metrics.png
+        ├── ghostbuster_sentence_stats.csv
+        ├── ghostbuster_word_count_distributions.png
+        ├── ghostbuster_word_count_stats.csv
+        ├── rq1_significance.csv
+        ├── rq1_significance.txt
+        ├── stylometric_report.txt
+    └── 📁src
+        └── 📁analysis
+            └── 📁__pycache__
+                ├── analyze_corpus.cpython-312.pyc
+                ├── mining.cpython-312.pyc
+            ├── analyze_corpus.py
+            ├── build_constituency_features.py
+            ├── build_doc_features.py
+            ├── feng_classifiers.py
+            ├── mining.py
+            ├── run_feature_analysis.py
+            ├── run_rq1_significance.py
+        └── 📁parsing
+            ├── constituency_parse.py
+            ├── dependency_parse.py
+            ├── fix_author_reuters.py
+    ├── .gitignore
+    ├── .python-version
+    ├── pyproject.toml
+    ├── README.md
+    └── uv.lock
 ```
 
 ## Datasets
