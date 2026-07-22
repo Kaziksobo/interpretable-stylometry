@@ -159,31 +159,35 @@ def get_terminals(tree: Tree) -> list[str]:
     return terminals
 
 
-def get_terminals_at_depth(tree: Tree, depth: int) -> list[str]:
+def get_pattern_anchor_words(tree: Tree, depth: int) -> list[str]:
     """
-    Get terminal words that would be covered by a subtree at given depth.
+    Get the first word under each leaf node of the abstract pattern.
 
-    For depth=2, gets the first terminal under each immediate child.
-    For depth=3, gets terminals from children and grandchildren, etc.
+    Where get_terminals_at_depth returns ALL words under the pattern's
+    coverage, this returns just the FIRST word under each structural
+    position that appears as a leaf at this depth. This gives concise
+    anchor words showing which word fills each slot in the pattern,
+    rather than dumping every word under the entire subtree.
+
+    Example: (S (NP (DT)) (VP (VBZ) (VP)) (.)) at depth=2
+        -> ["This", "has", "."]   not the whole sentence
     """
     if not isinstance(tree, Tree):
         return [str(tree)]
 
     if depth <= 1:
-        # At depth 1, this node is a leaf in the pattern, so get ALL terminals
-        # under it (the pattern collapses this entire subtree)
-        return get_terminals(tree)
+        # This node is collapsed to a leaf in the pattern.
+        # Return just the first terminal word under it.
+        leaves = get_terminals(tree)
+        return [leaves[0]] if leaves else []
 
-    terminals = []
+    result = []
     for child in tree:
         if isinstance(child, Tree):
-            # Recurse with depth-1
-            child_terms = get_terminals_at_depth(child, depth - 1)
-            terminals.extend(child_terms)
+            result.extend(get_pattern_anchor_words(child, depth - 1))
         else:
-            terminals.append(str(child))
-
-    return terminals
+            result.append(str(child))
+    return result
 
 
 def extract_patterns_with_examples(
@@ -222,7 +226,7 @@ def extract_patterns_with_examples(
                 terminal_count = count_terminal_nodes(pattern)
                 if terminal_count >= min_terminals:
                     # Get representative terminals for this depth
-                    words = get_terminals_at_depth(t, depth)
+                    words = get_pattern_anchor_words(t, depth)
                     highlighted = " ".join(words)
                     yield (pattern, highlighted, sentence)
 

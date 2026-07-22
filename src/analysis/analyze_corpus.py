@@ -138,6 +138,6 @@ def highlight_in_sentence(sentence: str, words: str) -> str:
     pattern = r"\b" + r'[\s,;:\'"]*'.join(pattern_parts) + r"\b"
 
     def replacer(match):
-        return f"**{match.group(0)}**"
+        return f"*{match.group(0)}*"
 
     return re.sub(pattern, replacer, sentence, count=1, flags=re.IGNORECASE)

@@ -172,12 +172,12 @@ def analyze_and_compare_domain(
     return comparison_report
 
 
-def smart_truncate(text: str, max_len: int = 140) -> str:
-    """Truncates text but guarantees the **highlighted** portion remains visible."""
+def smart_truncate(text: str, max_len: int = 200) -> str:
+    """Truncates text but guarantees the *highlighted* portion remains visible."""
     if len(text) <= max_len:
         return text
 
-    start_idx = text.find("**")
+    start_idx = text.find("*")
 
     # If no highlight found, just truncate normally
     if start_idx == -1:
@@ -206,6 +206,34 @@ def pick_examples(item: dict, prefer_source: str, n: int = 2) -> tuple[list, str
                 label = fallback
                 break
     return pool[:n], label
+
+
+def format_example(ex: dict, source_label: str, idx: int) -> str:
+    """Format one example as matched words + highlighted sentence.
+
+    Matched words are always shown in full on their own line — this is
+    the guaranteed-visible part. The sentence line shows context; if
+    highlighting succeeded we truncate around the marker, otherwise we
+    show the full sentence untruncated since the words are already on
+    the line above.
+    """
+    words_display = " | ".join(ex["words"].split())
+    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
+
+    if "*" in highlighted:
+        # Highlighting found the words — truncate around the marker
+        sentence_display = smart_truncate(highlighted, max_len=200)
+    else:
+        # Words are non-contiguous in the surface text — regex couldn't
+        # find them. Show the full sentence as context; nothing is lost
+        # because the matched words are already shown separately above.
+        sentence_display = ex["sentence"]
+
+    return (
+        f"     ex{idx} [{source_label}]\n"
+        f"       words:    {words_display}\n"
+        f"       sentence: {sentence_display}"
+    )
 
 
 def main():
@@ -258,14 +286,12 @@ def main():
                 f.write(f"  -> Claude PMI: {item['claude_pmi']:+.3f}\n")
                 f.write(f"  -> Gap Size:   {item['model_gap']:.3f}\n")
 
-                gpt_exs, _ = pick_examples(item, "gpt", n=1)
-                claude_exs, _ = pick_examples(item, "claude", n=1)
-                for ex in gpt_exs:
-                    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(f"     ex [gpt]: {smart_truncate(highlighted, 140)}\n")
-                for ex in claude_exs:
-                    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(f"     ex [claude]: {smart_truncate(highlighted, 140)}\n")
+                gpt_exs, gpt_label = pick_examples(item, "gpt", n=1)
+                claude_exs, claude_label = pick_examples(item, "claude", n=1)
+                for i, ex in enumerate(gpt_exs):
+                    f.write(format_example(ex, gpt_label, i + 1) + "\n")
+                for i, ex in enumerate(claude_exs):
+                    f.write(format_example(ex, claude_label, i + 1) + "\n")
 
             # --- 2. STRONGEST GPT SIGNATURES ---
             gpt_strongest = sorted(
@@ -286,13 +312,7 @@ def main():
 
                 examples, source_label = pick_examples(item, "gpt")
                 for i, ex in enumerate(examples):
-                    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(
-                        (
-                            f"     ex{i + 1} [{source_label}]: "
-                            f"{smart_truncate(highlighted, 140)}\n"
-                        )
-                    )
+                    f.write(format_example(ex, source_label, i + 1) + "\n")
 
             # --- 3. STRONGEST CLAUDE SIGNATURES ---
             claude_strongest = sorted(
@@ -313,13 +333,7 @@ def main():
 
                 examples, source_label = pick_examples(item, "claude")
                 for i, ex in enumerate(examples):
-                    highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                    f.write(
-                        (
-                            f"     ex{i + 1} [{source_label}]: "
-                            f"{smart_truncate(highlighted, 140)}\n"
-                        )
-                    )
+                    f.write(format_example(ex, source_label, i + 1) + "\n")
 
             # --- 4. CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES THESE ---
             categorical_patterns = sorted(
@@ -354,13 +368,7 @@ def main():
                     present_source = present.lower()
                     examples, source_label = pick_examples(item, present_source)
                     for i, ex in enumerate(examples):
-                        highlighted = highlight_in_sentence(ex["sentence"], ex["words"])
-                        f.write(
-                            (
-                                f"     ex{i + 1} [{source_label}]: "
-                                f"{smart_truncate(highlighted, 140)}\n"
-                            )
-                        )
+                        f.write(format_example(ex, source_label, i + 1) + "\n")
 
             domain_time = time.time() - start_time
             f.write(f"\n[ Domain '{domain}' completed in {domain_time:.1f}s ]\n")
