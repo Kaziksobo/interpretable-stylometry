@@ -1,6 +1,6 @@
 # Interpretable Stylometry for Human and AI Prose
 
-Research code for a micro-placement project supervised by Dr Paul Nulty (Birkbeck, University of London), connected to the broader project *Interpretable Stylometry for Human and AI Prose* (Co-PIs: Dr Paul Nulty and Dr Ryan Heuser).
+Research code for a micro-placement project supervised by Dr Paul Nulty (Birkbeck, University of London).
 
 ## Project Overview
 
