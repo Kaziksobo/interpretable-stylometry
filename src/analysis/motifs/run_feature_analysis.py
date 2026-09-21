@@ -237,9 +237,13 @@ def format_example(ex: dict, source_label: str, idx: int) -> str:
 
 
 def main():
-    PROJECT_ROOT = Path(__file__).parent.parent.parent
-    INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_parses.feather"
-    OUTPUT_PATH = PROJECT_ROOT / "results" / "stylometric_report.txt"
+    PROJECT_ROOT = next(
+        p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
+    )
+    INPUT_PATH = (
+        PROJECT_ROOT / "data" / "processed" / "parses" / "constituency_parses.feather"
+    )
+    OUTPUT_PATH = PROJECT_ROOT / "results" / "motifs" / "stylometric_report.txt"
     print("Loading Feather file...")
     # Update to your actual dataset file path
     df = pd.read_feather(INPUT_PATH)

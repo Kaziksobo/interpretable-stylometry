@@ -21,15 +21,18 @@ All p-values are FDR-corrected (Benjamini-Hochberg) across the full set
 of tests to control the false discovery rate at 5%.
 
 Inputs:
-    data/processed/doc_features.feather  (built by build_doc_features.py)
+    data/processed/rq1/doc_features.feather  (built by build_doc_features.py)
     doc_features stores raw sentence COUNTS per document. This script
     converts them to per-document RATES (count / n_sents) before testing,
     because rates are the correct unit for comparing documents of different
     lengths.
 
 Outputs:
-    results/rq1_significance.csv  -- full results table, one row per test
-    results/rq1_significance.txt  -- human-readable summary of findings
+    results/rq1/rq1_diagnostics_significance.csv  -- full results table, one row per test
+    results/rq1/rq1_diagnostics_significance.txt  -- human-readable summary of findings
+
+Note: this is the Track 3 / diagnostic layer, not RQ1's headline answer --
+see docs/rq1_methodology.md for the full three-track design.
 """
 
 from pathlib import Path
@@ -38,10 +41,16 @@ import pandas as pd
 from scipy import stats
 from statsmodels.stats.multitest import multipletests
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "doc_features.feather"
-OUTPUT_CSV = PROJECT_ROOT / "results" / "rq1_significance.csv"
-OUTPUT_TXT = PROJECT_ROOT / "results" / "rq1_significance.txt"
+PROJECT_ROOT = next(
+    p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
+)
+INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "rq1" / "doc_features.feather"
+OUTPUT_CSV = (
+    PROJECT_ROOT / "results" / "rq1" / "rq1_diagnostics_significance.csv"
+)
+OUTPUT_TXT = (
+    PROJECT_ROOT / "results" / "rq1" / "rq1_diagnostics_significance.txt"
+)
 
 DOMAINS = ["essay", "reuter", "wp"]
 COMPARISONS = [("human", "gpt"), ("human", "claude")]

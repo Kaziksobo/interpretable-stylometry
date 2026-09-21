@@ -27,9 +27,13 @@ from pathlib import Path
 
 import pandas as pd
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
-INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_features.feather"
-OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "doc_features.feather"
+PROJECT_ROOT = next(
+    p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
+)
+INPUT_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "rq1" / "constituency_features.feather"
+)
+OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "rq1" / "doc_features.feather"
 
 GROUP_COLS = ["doc_id", "domain", "source", "author"]
 

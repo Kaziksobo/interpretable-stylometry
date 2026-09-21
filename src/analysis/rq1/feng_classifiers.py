@@ -39,10 +39,16 @@ import pandas as pd
 from nltk import Tree
 from tqdm import tqdm
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = next(
+    p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
+)
 
-INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_parses.feather"
-OUTPUT_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_features.feather"
+INPUT_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "parses" / "constituency_parses.feather"
+)
+OUTPUT_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "rq1" / "constituency_features.feather"
+)
 
 
 def load_data(data_path: Path) -> pd.DataFrame:

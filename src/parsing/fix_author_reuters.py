@@ -16,10 +16,16 @@ import pandas as pd
 import spacy
 from tqdm import tqdm
 
-PROJECT_ROOT = Path(__file__).parent.parent.parent
+PROJECT_ROOT = next(
+    p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
+)
 CORPUS_PATH = PROJECT_ROOT / "data" / "processed" / "corpus.feather"
-CONSTITUENCY_PATH = PROJECT_ROOT / "data" / "processed" / "constituency_parses.feather"
-DEPENDENCY_PATH = PROJECT_ROOT / "data" / "processed" / "dependency_parses.feather"
+CONSTITUENCY_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "parses" / "constituency_parses.feather"
+)
+DEPENDENCY_PATH = (
+    PROJECT_ROOT / "data" / "processed" / "parses" / "dependency_parses.feather"
+)
 
 
 def build_author_lookup(corpus_df: pd.DataFrame) -> pd.DataFrame:
