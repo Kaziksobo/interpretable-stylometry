@@ -2,11 +2,11 @@
 dependency_parses.feather, without re-running benepar.
 
 corpus.feather already has `author` (see load_corpus() in
-ghostbuster_exploratory_analysis.ipynb) -- constituency_parse.py just never
+ghostbuster_exploratory_analysis.ipynb) - constituency_parse.py just never
 copied it into its output records. Reuters doc_id alone can't disambiguate
 documents (1-20 repeats across 50 author subfolders), but sentence text at a
 given sent_idx can, once sentence boundaries are re-derived with the SAME
-model used originally (en_core_web_trf) -- minus benepar, which is what made
+model used originally (en_core_web_trf) - minus benepar, which is what made
 the original run take ~3 hours and isn't needed for this fix.
 """
 
