@@ -37,7 +37,7 @@
   - algo2: {LOOSE, PERIODIC, OTHER}
 - Filter: exclude `n_sents < 5` — degenerate compositions below this (e.g. `n_sents=1` is 100% one category, tells you nothing about tendency)
   - Cost: 80 documents (0.89%) — essay/human 6, reuter/claude 16, reuter/gpt 19, reuter/human 15, wp/claude 8, wp/gpt 3, wp/human 13
-  - **Applies to all three tracks** — one shared `filter_min_sents` (`compositions.py`), called by all three driver scripts, so every track tests the same document pool
+  - **Applies to all three tracks** — one shared `filter_min_sents` (`src/analysis/shared/filters.py`, shared with RQ0), called by all three driver scripts, so every track tests the same document pool
 - algo1 conforming-count filter (Tracks 1 and 2 only; Track 3 is unaffected): exclude documents with `denom ≤ 1`, where `denom = c_S+c_C+c_Cd+c_CC`
   - `denom = 0`: proportions undefined — 4 documents left after the `n_sents` filter
   - `denom = 1`: one conforming sentence forces `Z=3`, and with `δ = 0.5/1` the replacement scaling factor is `1 − 3·0.5 = −0.5`, i.e. negative. Left in, that one document's `NaN` passed through `clr_transform` and silently voided an entire 2,008-document Mann-Whitney cell (reuter, human_vs_claude, sentence_type) — 1 document
@@ -233,7 +233,8 @@
 |---|---|---|
 | Shared preprocessing | `src/analysis/rq1/compositions.py` | — (utility module, no direct output) |
 | Shared preprocessing | `src/analysis/rq1/entropy.py` | — (utility module, no direct output) |
-| Shared preprocessing | `src/analysis/rq1/significance_utils.py` | — (utility module, no direct output) |
+| Shared (RQ0 and RQ1) | `src/analysis/shared/significance_utils.py` | — (utility module, no direct output) |
+| Shared (RQ0 and RQ1) | `src/analysis/shared/filters.py` | — (utility module: `filter_min_sents`) |
 | Track 1 (Variance) | `src/analysis/rq1/run_rq1_variance.py` | `data/processed/rq1/doc_distances.feather`, `results/rq1/rq1_variance_significance.csv`, `results/rq1/centroids.csv` |
 | Track 2 (Regularity) | `src/analysis/rq1/run_rq1_regularity.py` | `data/processed/rq1/doc_entropy.feather`, `results/rq1/rq1_regularity_significance.csv` |
 | Track 3 (Diagnostics) | `src/analysis/rq1/run_rq1_significance.py` (+filter, +CV, +stability flag; uses `run_test_family` and `apply_fdr`) | `results/rq1/rq1_diagnostics_significance.csv` (renamed from `rq1_significance.csv`; the old `.txt` summary is no longer produced) |
@@ -249,7 +250,7 @@ The point of this table: before writing a function, check which track(s) actuall
 
 | Function                                                  | Used by                | Step(s)                               | Notes                                                                                                                                                                                          |
 | --------------------------------------------------------- | ---------------------- | ------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `filter_min_sents`                                        | Tracks **1, 2, and 3** | §4.1 step 1, §5.1 step 1, §6.1 step 1 | Single source of truth for the `n_sents<5` filter — all three driver scripts call it                                                                          |
+| `filter_min_sents`                                        | Tracks **1, 2, and 3** | §4.1 step 1, §5.1 step 1, §6.1 step 1 | Single source of truth for the `n_sents<5` filter — all three driver scripts call it. Moved to `src/analysis/shared/filters.py` so RQ0 uses the same filter; no longer in `compositions.py`                                                                          |
 | `compute_proportions_algo1` / `compute_proportions_algo2` | Tracks 1, 2            | §4.1 step 2, §5.1 step 1              | **Not** Track 3 — Track 3 has its own denominator (Eq. 14, full `n_sents` including `OTHER`); don't reuse this function there, the two are deliberately different scales (§6 denominator note) |
 | `compute_deltas`                                          | Track 1 only           | §4.1 step 3                           | Track 2 has no zero-replacement step at all                                                                                                                                                    |
 | `multiplicative_replacement`                              | Track 1 only           | §4.1 step 4                           |                                                                                                                                                                                                |
@@ -265,7 +266,7 @@ The point of this table: before writing a function, check which track(s) actuall
 | `plugin_entropy` | Track 2 | §5.1 step 3 |
 | `miller_madow` | Track 2 | §5.1 step 4 |
 
-**`significance_utils.py`** — the most shared file, all three tracks:
+**`src/analysis/shared/significance_utils.py`** — the most shared file, all three RQ1 tracks and RQ0:
 
 | Function | Used by | Step(s) | Notes |
 |---|---|---|---|
