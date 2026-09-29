@@ -1,6 +1,6 @@
 """Shared compositional-data utilities for RQ1 Tracks 1 and 2.
 
-Filtering, proportion computation, per-document zero-replacement, and the
+Proportion computation, per-document zero-replacement, and the
 CLR transform -- everything needed to turn doc_features.feather counts into
 a valid composition ready for either the variance (Track 1) or regularity
 (Track 2) pipeline.
@@ -48,27 +48,6 @@ def inverse_clr(Y: np.ndarray) -> np.ndarray:
     """
     exp_y = np.exp(Y)
     return exp_y / np.sum(exp_y, axis=-1, keepdims=True)
-
-
-def filter_min_sents(df: pd.DataFrame, min_sents: int = 5) -> pd.DataFrame:
-    """Excludes documents with fewer than min_sents sentences (§3).
-
-    A document with very few sentences gives an unreliable composition --
-    e.g. n_sents=1 is 100% one category by construction, and tells us
-    nothing about the document's actual tendency.
-
-    Args:
-        df (pd.DataFrame): Any DataFrame with an "n_sents" column, e.g.
-            doc_features.feather loaded directly.
-        min_sents (int): Minimum sentence count required to keep a
-            document. Defaults to 5.
-
-    Returns:
-        pd.DataFrame: The filtered rows, with a fresh 0-based index.
-    """
-    filtered_df = df[df["n_sents"] >= min_sents]
-    filtered_df.reset_index(drop=True, inplace=True)
-    return filtered_df
 
 
 def compute_proportions_algo1(df: pd.DataFrame) -> pd.DataFrame:

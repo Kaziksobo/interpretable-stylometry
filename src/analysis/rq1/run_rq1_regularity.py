@@ -22,11 +22,12 @@ import pandas as pd
 from compositions import (
     compute_proportions_algo1,
     compute_proportions_algo2,
-    filter_min_sents,
 )
 from entropy import miller_madow, plugin_entropy
 from scipy import stats
-from significance_utils import apply_fdr, run_test_family
+
+from src.analysis.shared.filters import filter_min_sents
+from src.analysis.shared.significance_utils import apply_fdr, run_test_family
 
 PROJECT_ROOT = next(
     p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
