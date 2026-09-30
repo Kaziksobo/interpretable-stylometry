@@ -47,7 +47,7 @@ INPUT_PATH = (
     PROJECT_ROOT / "data" / "processed" / "parses" / "constituency_parses.feather"
 )
 OUTPUT_PATH = (
-    PROJECT_ROOT / "data" / "processed" / "rq1" / "constituency_features.feather"
+    PROJECT_ROOT / "data" / "processed" / "features" / "constituency_features.feather"
 )
 
 

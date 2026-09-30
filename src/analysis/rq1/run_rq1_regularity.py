@@ -32,7 +32,7 @@ from src.analysis.shared.significance_utils import apply_fdr, run_test_family
 PROJECT_ROOT = next(
     p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
 )
-INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "rq1" / "doc_features.feather"
+INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "features" / "doc_features.feather"
 ENTROPY_OUTPUT = PROJECT_ROOT / "data" / "processed" / "rq1" / "doc_entropy.feather"
 SIGNIFICANCE_OUTPUT = (
     PROJECT_ROOT / "results" / "rq1" / "rq1_regularity_significance.csv"

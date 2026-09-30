@@ -22,7 +22,7 @@ from src.analysis.shared.filters import filter_min_sents
 PROJECT_ROOT = next(
     p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
 )
-INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "rq1" / "doc_features.feather"
+INPUT_PATH = PROJECT_ROOT / "data" / "processed" / "features" / "doc_features.feather"
 RATES_OUTPUT = PROJECT_ROOT / "results" / "rq0" / "rq0_rates.csv"
 
 Z_95 = 1.96
