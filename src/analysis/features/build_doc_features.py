@@ -5,9 +5,6 @@ Each output row represents one document. Category columns contain raw sentence
 counts (not proportions) - divide by n_sents in downstream analysis to get
 rates when needed.
 
-Requires constituency_features.feather to have an 'author' column.
-Run build_constituency_features.py first if it does not.
-
 Output schema (one row per document):
     doc_id               : str - document identifier
     domain               : str - "essay" | "reuter" | "wp"
@@ -18,6 +15,7 @@ Output schema (one row per document):
     sent_complex         : int - COMPLEX sentences
     sent_compound        : int - COMPOUND sentences
     sent_complex_compound: int - COMPLEX-COMPOUND sentences
+    sent_other           : int - OTHER (sentence type)
     struct_loose         : int - LOOSE sentences
     struct_periodic      : int - PERIODIC sentences
     struct_other         : int - OTHER (structure)
@@ -48,6 +46,17 @@ def main() -> None:
             "'author' column missing from constituency_features.feather.\n"
             "Run build_constituency_features.py first."
         )
+
+    # Removing Sentences with no letters
+    has_letters = df["sent_text"].str.contains(r"[^\W\d_]", regex=True, na=False)
+
+    # Removing Reuter sentences with no author
+    reuter_orphan = (df["domain"] == "reuter") & df["author"].isna()
+
+    print(f"  dropping {(~has_letters).sum():,} sentences with no letters")
+    print(f"  dropping {reuter_orphan.sum():,} reuter sentences with no author")
+    df = df[has_letters & ~reuter_orphan].reset_index(drop=True)
+    print(f"  {len(df):,} sentences remain")
 
     # Replace None author with placeholder so groupby doesn't drop essay/wp rows
     df["author"] = df["author"].fillna("__none__")
