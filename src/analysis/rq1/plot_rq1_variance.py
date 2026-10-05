@@ -1,4 +1,4 @@
-"""Plots RQ1 Track 1: per domain, grouped bars of each category's between-document
+"""Plots RQ1: per domain, grouped bars of each category's between-document
 variance (rho, % of the maximum possible at that rate) by source.
 
 Same layout as RQ0: one figure per domain, two panels (sentence type, sentence

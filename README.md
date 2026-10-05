@@ -19,10 +19,10 @@ A full literature review motivating these questions is available in `docs/`.
 
 **RQ0 - Complete**. Mean rate of each Feng et al. (2012) sentence type (SIMPLE/COMPLEX/COMPOUND/COMPLEX-COMPOUND/OTHER) and structure (LOOSE/PERIODIC/OTHER) per document, averaged per domain and source with 95% intervals. Charts in `results/rq0/`; method in `docs/rq0_methodology.md`.
 
-**RQ1 - In progress**.
+**RQ1 - Variance analysis complete**.
 
-- **Track 1 (between-document variance) - complete**: per category, the variance of document rates with each document's sampling noise removed, relative to its maximum possible; uncertainty by resampling (whole authors for Reuters); human vs AI z-tests with Benjamini-Hochberg FDR correction. Charts in `results/rq1/`; method, verification and results in `docs/rq1_methodology.md`.
-- **Track 2 (within-document regularity) - under review**.
+- **Between-document variance - complete**: per category, the variance of document rates with each document's sampling noise removed, relative to its maximum possible; uncertainty by resampling (whole authors for Reuters); human vs AI z-tests with Benjamini-Hochberg FDR correction. Charts in `results/rq1/`; method, verification and results in `docs/rq1_methodology.md`.
+- **Regularity**: treated as part of the variance question; see `docs/rq1_methodology.md` §5.
 - **Data-driven (syntactic motif mining)**: Bottom-up discovery of discriminatory phrase-structure patterns using induced subtree extraction from constituency parses. PMI-based comparison of GPT and Claude against human baseline, with categorical absence detection. Results in `results/motifs/stylometric_report.txt`.
 
 **RQ2 - Not yet started**. Dependency parses are available; prosodic feature extraction is pending.
@@ -43,8 +43,6 @@ A full literature review motivating these questions is available in `docs/`.
                 ├── constituency_parses.feather
                 ├── dependency_parses.bak.feather
                 ├── dependency_parses.feather
-            └── 📁rq1
-                ├── doc_entropy.feather
         └── 📁raw
     └── 📁docs
         ├── rq0_methodology.md
@@ -66,7 +64,6 @@ A full literature review motivating these questions is available in `docs/`.
             ├── rq0_rates.csv
             ├── rq0_rates_{essay,reuter,wp}.{png,pdf}
         └── 📁rq1
-            ├── rq1_regularity_significance.csv
             ├── rq1_variance.csv
             ├── rq1_variance_tests.csv
             ├── rq1_variance_tests_sensitivity.csv
@@ -84,10 +81,7 @@ A full literature review motivating these questions is available in `docs/`.
                 ├── plot_rq0.py
                 ├── run_rq0.py
             └── 📁rq1
-                ├── compositions.py
-                ├── entropy.py
                 ├── plot_rq1_variance.py
-                ├── run_rq1_regularity.py
                 ├── run_rq1_variance.py
             └── 📁shared
                 ├── filters.py

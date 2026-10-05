@@ -13,16 +13,14 @@
 - `ρ = V / μ(1−μ)` — relative between-document variance: the share of the maximum possible spread at that mean
 - `S²` — sample variance of the `r_i` (divisor `N−1`); `r̄` — their mean
 - Scheme — `sentence_type` (SIMPLE / COMPLEX / COMPOUND / COMPLEX-COMPOUND / OTHER) or `sentence_structure` (LOOSE / PERIODIC / OTHER), Feng et al. (2012)
-- Track 2 only: `H` — Shannon entropy (nats); `D` — parts in a composition
 
 ## 2. Research Question & Design
 
 - RQ1: "Does AI prose show reduced variance and greater regularity across interpretable syntactic features, such as loose/periodic sentences and clause complexity, when compared to human prose?"
 - RQ0 (`docs/rq0_methodology.md`) establishes how often each source uses each category; RQ1 asks how consistently, given those rates
-- **Track 1 — Variance** (complete): how much each category's rate varies *between* documents, per (domain, source, category), human vs each AI (§4)
-- **Track 2 — Regularity** (under review): within-document uniformity (§5)
-- **Track 3 — per-category diagnostics**: retired (§6)
-- Track 1's answer is one bar chart per domain (§10.4), the same layout as RQ0's
+- **Between-document variance** (complete): how much each category's rate varies *between* documents, per (domain, source, category), human vs each AI (§4)
+- RQ1 is answered by the variance analysis, with RQ0 as context; regularity is treated as part of the variance question, following Heuser's concentration finding (§5)
+- The answer is one bar chart per domain (§9.4), the same layout as RQ0's
 
 ## 3. Data, Cleaning & Filtering
 
@@ -33,10 +31,9 @@
   - Result: 8,991 documents
 - How they were found: a scan for documents extreme under a fitted Beta-binomial (p < 10⁻⁴ per document-category, ~7 expected by chance) flagged 25 pairs in 20 documents; inspection traced most to these two artefacts. After cleaning: 17 pairs in 14 documents, mostly genuine writing; six judged non-prose feed the sensitivity pass (§4.6)
 - Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 42 documents excluded (0.47%) → **8,949 documents, 987–1,000 per group**; same pool as RQ0
-- Track 1: denominator `n_sents` for all 8 categories, both OTHERs included, as in RQ0. No zero-replacement, so the old algo1-OTHER exclusion and `denom ≤ 1` rule don't apply
-- Track 2 still uses the algo1 conforming-only composition and `denom ≤ 1` exclusion (§5)
+- Denominator `n_sents` for all 8 categories, both OTHERs included, as in RQ0. No zero-replacement, so the old algo1-OTHER exclusion and `denom ≤ 1` rule don't apply
 
-## 4. Track 1 — Between-Document Variance
+## 4. Between-Document Variance
 
 ### 4.1 The quantity
 
@@ -163,77 +160,43 @@
 - Independence: handled for reuter by resampling authors; essay and wp have no author information, so documents are assumed independent
 - The six-document judgement is by inspection, which is why it is a sensitivity pass, not an exclusion
 - `ρ̂` ratios are unstable near zero (e.g. reuter GPT type OTHER) — the test uses the difference, not the ratio
-- Per-category by design — no single composition-level number (the shared-`ρ` model that would give one didn't fit, §7)
+- Per-category by design — no single composition-level number (the shared-`ρ` model that would give one didn't fit, §6)
 
-## 5. Track 2 — Regularity (under review)
+## 5. Regularity
 
-- **Status**: as originally implemented; outputs regenerated on the cleaned data; not yet re-examined with Track 1's level of scrutiny. The known issues below need resolving before its results are reported
+- RQ1 pairs "reduced variance" with "greater regularity". In Heuser (2025b), where RQ1 comes from, these are one finding seen from two sides: AI verse conforms more to the conventional form, and occupies a more concentrated space of forms than human verse
+- The natural within-document measure of syntactic regularity — how evenly a document spreads across the categories (the entropy of its mix) — adds nothing new: a document's mix is its group's average mix (RQ0) plus its own deviation from it (§4). Mean document entropy correlates 0.988 with the entropy of the group's average mix, and follows its direction in 10 of 12 human-vs-AI comparisons
+- So regularity is treated as part of the variance question — greater regularity shows up as a more concentrated group, i.e. smaller between-document variance — answered by §4, with RQ0's rates as context, and not investigated separately
 
-### 5.1 Pipeline (current implementation)
-
-- **Step 1**: proportions via `compute_proportions_algo1` (4 conforming categories, `denom ≤ 1` excluded) and `compute_proportions_algo2` (3 categories, `n_sents`); no zero-replacement (`0·ln(0) := 0`)
-- **Step 2**: composition-specific `n` for the bias correction:
-
-  $$n = c_S+c_C+c_{Cd}+c_{CC} \ \text{(algo1)}, \qquad n = n\_sents \ \text{(algo2)} \tag{9}$$
-
-- **Step 3**: plug-in Shannon entropy per document:
-
-  $$\hat{H} = -\sum_j p_j \ln(p_j) \tag{10}$$
-
-- **Step 4**: Miller-Madow bias correction:
-
-  $$H_{MM} = \hat{H} + \frac{D-1}{2n} \tag{11}$$
-
-- **Step 5**: Mann-Whitney U on `H_MM`, human vs each AI, per domain and composition; 12 tests, one BH-FDR family; lower AI entropy read as "greater regularity"
-### 5.2 Known issues
-
-- **Entropy depends on the mean composition**: a document's entropy is higher the more even its mix, so RQ0's rate differences leak into "regularity" (e.g. wp Claude 52% SIMPLE vs human 40%) — the same kind of confound that broke the original Track 1
-- **Residual length dependence** after Miller-Madow: correlation of `H_MM` with `n_sents` differs between sources within a domain by up to 0.17 (measured before cleaning)
-- **Mann-Whitney** compares distributions, not means or any single parameter (§7)
-- The algo1 conforming-only scope and `denom ≤ 1` exclusion were inherited from the CLR track; their original reason no longer applies
-- **Definition**: "regularity" needs a definition distinct from Track 1's `ρ`, which is itself a within-document correlation (§4.1)
-
-## 6. Track 3 — Retired
-
-- Was: per-category Brown-Forsythe (dispersion) and Mann-Whitney (location), two 48-test families
-- Location half → RQ0, done properly; Mann-Whitney isn't a test of rates (§7)
-- Dispersion half → Track 1, done properly: Brown-Forsythe compared mostly noise and was capped by the mean (§7)
-- Removed: `run_rq1_significance.py`, `rq1_diagnostics_significance.csv`
-
-## 7. Approaches Tried and Rejected
+## 6. Approaches Tried and Rejected
 
 | Approach | What it did | Why rejected — evidence |
 |---|---|---|
-| CLR distance-to-centroid (original Track 1) | Zero-replacement `δ_i = 0.5/n_i`, centred log-ratio transform, Euclidean distance to the group centroid, Mann-Whitney | With equal true variance, real means and lengths: 62% (wp) and 63% (reuter) false positives. Zero-replacement puts a `−(3/4)·ln n_i` term into a replaced category's CLR value (fitted slope −0.785); and CLR spread behaves like a multivariate CV², growing as a mean shrinks (`Var(ln p)` 2.73× and 3.13× larger for GPT than human in reuter COMPOUND and COMPLEX-COMPOUND at identical `ρ`) — even perfect, noise-free data rejected 98–100% |
+| CLR distance-to-centroid (original variance analysis) | Zero-replacement `δ_i = 0.5/n_i`, centred log-ratio transform, Euclidean distance to the group centroid, Mann-Whitney | With equal true variance, real means and lengths: 62% (wp) and 63% (reuter) false positives. Zero-replacement puts a `−(3/4)·ln n_i` term into a replaced category's CLR value (fitted slope −0.785); and CLR spread behaves like a multivariate CV², growing as a mean shrinks (`Var(ln p)` 2.73× and 3.13× larger for GPT than human in reuter COMPOUND and COMPLEX-COMPOUND at identical `ρ`) — even perfect, noise-free data rejected 98–100% |
 | Dirichlet-multinomial, one `ρ` per composition | One relative variance per composition, likelihood-ratio test | Model didn't fit: per-category `ρ` spread 1.3–6.1× within a group; observed ÷ predicted variance 0.69–1.49; the single number hid categories pulling in opposite directions (essay COMPOUND) |
 | Beta-binomial per category, maximum likelihood | One smooth curve for the true rates; likelihood-ratio test | Test well calibrated (3.5–6.5%), but the curve shape biases `ρ` in whichever direction the true shape dictates (two-curve truth: 106% of true variance); on real wp human, 12–43% below Eq. 6 |
-| Brown-Forsythe, variance ratio, CV (Track 3) | Raw spread of document rates | Raw variance is mostly sampling noise (59–92% in reuter) and capped by `μ(1−μ)`; variance ratio and CV disagreed on direction in 23 of 33 significant tests |
-| Mann-Whitney as a test of rates (Track 3 location) | Ranks of document rates | Same true mean, different spread: 100% false positives (essay type OTHER, human vs GPT); pooled chi-square 44%; Beta-binomial LR 3% |
+| Brown-Forsythe, variance ratio, CV | Raw spread of document rates | Raw variance is mostly sampling noise (59–92% in reuter) and capped by `μ(1−μ)`; variance ratio and CV disagreed on direction in 23 of 33 significant tests |
+| Mann-Whitney as a test of rates | Ranks of document rates | Same true mean, different spread: 100% false positives (essay type OTHER, human vs GPT); pooled chi-square 44%; Beta-binomial LR 3% |
 
-## 8. Multiple Comparisons
+## 7. Multiple Comparisons
 
-| Family | Tests | Question |
-|---|---|---|
-| Track 1 — Variance | 48 | between-document variance, per category |
-| Track 2 — Regularity (current implementation) | 12 | within-document uniformity |
-
-- Benjamini-Hochberg (`fdr_bh`) via the shared `apply_fdr`, called once per family — never per domain or per scheme
-- Families corrected separately: they answer different questions
+- One family: the 48 variance tests (8 categories × 3 domains × 2 comparisons)
+- Benjamini-Hochberg (`fdr_bh`) via the shared `apply_fdr`, called once on all 48 — never per domain or per scheme
 - BH over Bonferroni: controls the expected false-discovery proportion; Bonferroni (α/48) is too conservative for a descriptive multi-category design
 
-## 9. Implementation Mapping
+## 8. Implementation Mapping
 
-### 9.1 Script → output
+### 8.1 Script → output
 
 | Script | Outputs |
 |---|---|
 | `src/analysis/features/build_doc_features.py` | `data/processed/features/doc_features.feather` (cleaning, §3) |
 | `src/analysis/rq1/run_rq1_variance.py` | `rq1_variance.csv`, `rq1_variance_tests.csv`, `rq1_variance_tests_sensitivity.csv` |
 | `src/analysis/rq1/plot_rq1_variance.py` | `rq1_variance_{essay,reuter,wp}.{png,pdf}` |
-| `src/analysis/rq1/run_rq1_regularity.py` (Track 2, under review) | `data/processed/rq1/doc_entropy.feather`, `rq1_regularity_significance.csv` |
-| `src/analysis/shared/filters.py`, `significance_utils.py` | — (shared with RQ0) |
+| `src/analysis/shared/filters.py` | — (`filter_min_sents`, shared with RQ0) |
+| `src/analysis/shared/significance_utils.py` | — (`apply_fdr`) |
 
-### 9.2 Function → step (`run_rq1_variance.py`)
+### 8.2 Function → step (`run_rq1_variance.py`)
 
 | Function | Does |
 |---|---|
@@ -245,10 +208,9 @@
 | `_exclude_assessed` | §4.6 — removes the six documents, failing loudly unless each matches exactly one |
 | `main` | main pass, then the sensitivity pass; writes all three CSVs and prints a summary |
 
-- Track 2: `compositions.compute_proportions_algo1/2`, `entropy.plugin_entropy`, `entropy.miller_madow`, `shared.significance_utils.run_test_family`
-## 10. Output Specifications
+## 9. Output Specifications
 
-### 10.1 `results/rq1/rq1_variance.csv` — 72 rows
+### 9.1 `results/rq1/rq1_variance.csv` — 72 rows
 
 | Column | Type | Description |
 |---|---|---|
@@ -261,7 +223,7 @@
 | `rho_se` | float | SD of the 2,000 resampled `ρ̂` |
 | `rho_ci_low`, `rho_ci_high` | float | 2.5th and 97.5th percentiles |
 
-### 10.2 `results/rq1/rq1_variance_tests.csv` — 48 rows
+### 9.2 `results/rq1/rq1_variance_tests.csv` — 48 rows
 
 | Column | Type | Description |
 |---|---|---|
@@ -274,20 +236,15 @@
 | `significant` | bool | `p_value_fdr < 0.05` |
 | `verdict` | str | human more variable / AI more variable / no difference |
 
-### 10.3 `results/rq1/rq1_variance_tests_sensitivity.csv` — 48 rows
+### 9.3 `results/rq1/rq1_variance_tests_sensitivity.csv` — 48 rows
 
 - `domain`, `comparison`, `scheme`, `category`; `rho_diff`, `p_value_fdr`, `verdict` for each pass (suffixes `_main`, `_excl`); `verdict_changed` (bool)
 
-### 10.4 Figures — `results/rq1/rq1_variance_{essay,reuter,wp}.{png,pdf}`
+### 9.4 Figures — `results/rq1/rq1_variance_{essay,reuter,wp}.{png,pdf}`
 
-- **Track 1's answer** — RQ0's layout: per domain, two panels (sentence type, sentence structure), grouped bars human / GPT / Claude, `ρ̂` as % of maximum, asymmetric 95% resampling intervals, zero line
+- **RQ1's answer** — RQ0's layout: per domain, two panels (sentence type, sentence structure), grouped bars human / GPT / Claude, `ρ̂` as % of maximum, asymmetric 95% resampling intervals, zero line
 
-### 10.5 Track 2 outputs (current implementation)
+## 10. Open Items
 
-- `data/processed/rq1/doc_entropy.feather` — `doc_id`, `domain`, `source`, `author`, `composition`, `entropy_plugin`, `entropy_mm`
-- `results/rq1/rq1_regularity_significance.csv` — 12 rows: `composition`, `domain`, `comparison`, `n_human`, `n_ai`, `mean_entropy_human`, `mean_entropy_ai`, `median_entropy_human`, `median_entropy_ai`, `entropy_ratio`, `U_stat`, `p_value`, `p_value_fdr`, `significant`
-
-## 11. Open Items
-
-- Track 2: definition, the known issues in §5.2, and a calibration check like Track 1's (§4.5) before results are reported
-- Reuters author clustering is handled in Track 1 but not yet in Track 2, nor in RQ0's descriptive error bars
+- Regularity read as conformity — whether AI uses the marked end of each distinction less (e.g. PERIODIC vs LOOSE, non-canonical OTHER), using RQ0's rates; needs a markedness classification justified from linguistics, not from the results — possible follow-up, to discuss with Paul
+- Reuters author clustering is handled in the variance analysis but not in RQ0's descriptive error bars

@@ -1,5 +1,4 @@
-"""RQ1 Track 1:
-    is the rate of each sentence type/structure less variable between AI documents?
+"""RQ1: is the rate of each sentence type/structure less variable between AI documents?
 
 For each (domain, source, category): the real between-document variance of the
 rate, V-hat = S^2 - mean noise, with each document's binomial noise estimated
@@ -9,7 +8,7 @@ compared with a z-test on the difference in rho-hat, FDR-corrected across all
 48 tests. A second pass without the six documents judged invalid on inspection
 checks whether any verdict depends on them.
 
-See docs/rq1_methodology.md (Track 1).
+See docs/rq1_methodology.md §4.
 
 Inputs:
     data/processed/features/doc_features.feather
