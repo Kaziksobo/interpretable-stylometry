@@ -4,9 +4,16 @@ Subtree pattern extraction and counting.
 Extracts induced subtrees from constituency parse trees and counts their frequencies.
 """
 
+import re
+from collections import Counter
 from typing import Iterator
 
 from nltk import Tree
+
+# a leaf label counts towards min_terminals only if it looks like a phrase or
+# POS tag; punctuation tags such as "," "." ":" do not (this mirrors the regex
+# in count_terminal_nodes)
+_COUNTABLE_LABEL = re.compile(r"[A-Z$][A-Z0-9$-]*")
 
 
 def extract_induced_subtrees(
@@ -235,3 +242,105 @@ def extract_patterns_with_examples(
                 yield from walk_and_extract(child)
 
     yield from walk_and_extract(tree)
+
+
+def count_patterns(
+    tree: Tree, max_depth: int = 4, min_depth: int = 2, min_terminals: int = 2
+) -> Counter:
+    """
+    Count the pattern occurrences in one parse tree.
+
+    Finds the same patterns, with the same per-node de-duplication, as
+    extract_patterns_with_examples, but builds each node's depth-d pattern
+    string bottom-up from its children's depth-(d-1) strings instead of
+    constructing Tree objects, and does no example or anchor-word work. A
+    pattern is counted once per node it occurs at, so a pattern that occurs
+    at two nodes of the tree counts twice.
+
+    Args:
+        tree: NLTK Tree (full constituency parse)
+        max_depth: Maximum subtree depth
+        min_depth: Minimum subtree depth (default 2 excludes single tags)
+        min_terminals: Minimum number of countable leaf nodes in the pattern
+
+    Returns:
+        Counter mapping canonical pattern strings to occurrence counts
+    """
+    counts: Counter = Counter()
+    _count_node(tree, max_depth, min_depth, min_terminals, counts)
+    return counts
+
+
+def _count_node(
+    node: Tree,
+    max_depth: int,
+    min_depth: int,
+    min_terminals: int,
+    counts: Counter,
+) -> list[tuple[str, int]]:
+    """
+    Count the patterns rooted at node and below, returning node's own forms.
+
+    Args:
+        node: Subtree to process
+        max_depth: Maximum subtree depth
+        min_depth: Minimum subtree depth
+        min_terminals: Minimum number of countable leaf nodes in the pattern
+        counts: Counter updated in place with every pattern found
+
+    Returns:
+        One (pattern string, countable leaf count) pair per depth 1..max_depth
+        for this node, so the parent can build its own deeper patterns.
+    """
+    label = node.label()
+    leaf_form = (f"({label})", int(_COUNTABLE_LABEL.fullmatch(label) is not None))
+
+    child_forms = [
+        _count_node(child, max_depth, min_depth, min_terminals, counts)
+        for child in node
+        if isinstance(child, Tree)
+    ]
+
+    if not child_forms:
+        forms = [leaf_form] * max_depth
+    else:
+        forms = [leaf_form]
+        for depth in range(2, max_depth + 1):
+            # a child contributes its own depth-1 form at this node's depth
+            kids = [cf[depth - 2] for cf in child_forms]
+            pattern = f"({label} {' '.join(k[0] for k in kids)})"
+            forms.append((pattern, sum(k[1] for k in kids)))
+
+    seen_at_this_node = set()
+    for depth in range(min_depth, max_depth + 1):
+        pattern, n_terminals = forms[depth - 1]
+        if pattern in seen_at_this_node:
+            continue
+        seen_at_this_node.add(pattern)
+        if n_terminals >= min_terminals:
+            counts[pattern] += 1
+
+    return forms
+
+
+def pattern_depth(pattern: str) -> int:
+    """
+    Return the depth of a canonical pattern string.
+
+    Depth counts levels including the root, i.e. the deepest parenthesis
+    nesting: "(NP (DT) (NN))" has depth 2 and "(S (NP (DT)) (VP))" depth 3.
+
+    Args:
+        pattern: Canonical pattern string
+
+    Returns:
+        Depth of the pattern
+    """
+    level = deepest = 0
+    for char in pattern:
+        if char == "(":
+            level += 1
+            deepest = max(deepest, level)
+        elif char == ")":
+            level -= 1
+    return deepest
