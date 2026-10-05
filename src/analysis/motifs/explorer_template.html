@@ -50,7 +50,7 @@ h1 { font: 600 1.9rem/1.2 var(--serif); margin: 0 0 .5rem; letter-spacing: -.01e
 .lede { margin: 0; color: var(--muted); }
 .lede code, .help code { font: .9em var(--mono); color: var(--ink); }
 
-.controls { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: .9rem 0; margin-top: 1rem; display: grid; gap: .8rem 2rem; grid-template-columns: repeat(auto-fit, minmax(160px, max-content)); align-items: end; }
+.controls { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: .9rem 0; margin-top: 1rem; display: flex; flex-wrap: wrap; gap: .9rem 2rem; align-items: flex-end; }
 .controls > * { min-width: 0; }
 .field { display: grid; gap: .25rem; }
 .field > span, fieldset legend { font-size: .85rem; color: var(--muted); padding: 0; }
@@ -130,6 +130,19 @@ tr.detail > td { background: var(--wash); padding: 1rem 1.2rem 1.4rem; border-to
 .tag-echo { font-size: .75rem; color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 0 .3em; margin-left: .4em; }
 
 .empty { padding: 2.2rem 1rem; text-align: center; color: var(--muted); }
+
+.examples { grid-column: 1 / -1; margin-top: .2rem; }
+.exgrid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1rem 2rem; }
+.exgrid h4 { font: 600 .95rem var(--sans); margin: 0 0 .5rem; }
+.exgrid h4 small { font-weight: 400; color: var(--muted); font-size: .8rem; margin-left: .5em; }
+.ex { margin: 0 0 .7rem; line-height: 2; font-size: .92rem; overflow-wrap: anywhere; }
+.ex .ctx { color: var(--muted); }
+.slot { border-radius: 3px; padding: .1em .3em .1em .15em; margin-right: 1px; box-decoration-break: clone; -webkit-box-decoration-break: clone; background: color-mix(in srgb, var(--ink) 5%, transparent); }
+.slot.phrase { background: color-mix(in srgb, var(--ink) 11%, transparent); }
+.slot.clause { background: color-mix(in srgb, var(--clause) 17%, transparent); }
+.sl { font: 600 .66rem var(--mono); color: var(--muted); margin-right: .4em; vertical-align: .15em; }
+.slot.clause .sl { color: var(--clause); }
+.noex { color: var(--muted); font-size: .88rem; margin: 0; }
 button.more { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: .5rem 1.1rem; margin: 1rem 0 0; cursor: pointer; }
 button.more:hover { background: var(--wash); }
 
@@ -207,6 +220,12 @@ table.pool thead th { color: var(--muted); font-size: .85rem; position: static; 
         <span>log2 units</span>
       </div>
     </div>
+    <div class="field">
+      <span>Examples</span>
+      <div class="checks">
+        <label><input type="checkbox" id="onlyEx">Only patterns with examples</label>
+      </div>
+    </div>
   </section>
 
   <main>
@@ -248,6 +267,8 @@ table.pool thead th { color: var(--muted); font-size: .85rem; position: static; 
       <dd>Keeps patterns where GPT and Claude differ from human in the same direction, and ranks them by the weaker of the two scores.</dd>
       <dt>Echo variants</dt>
       <dd>A pattern's parent is the same pattern cut off one level higher. A variant whose log2 ratio is within the threshold of its parent's, and has the same sign, adds nothing new, so it is folded under the parent. Variants that differ from their parent stay in the list: they show where the parent's difference comes from. Open a row to see all of its variants.</dd>
+      <dt>Examples</dt>
+      <dd>A random draw of sentences from each source (the same draw every time the page is built), with the pattern marked. Each coloured segment is one slot of the pattern, labelled with its constituent, so you can see which words fill which part. Examples are embedded only for the strongest patterns at each end of each ranking, so rows further down may have none; tick &ldquo;Only patterns with examples&rdquo; to hide those. Sentences are shown as the parser tokenised them.</dd>
     </dl>
     <p>The corpus is the Ghostbuster set. Counts are occurrences, so a pattern that occurs twice in a sentence counts twice. Only patterns used in at least <span id="floor"></span> documents of a domain are included.</p>
     <table class="pool" id="pool"></table>
@@ -276,6 +297,7 @@ const state = {
   query: "",
   fold: true,
   delta: 0.3,
+  onlyEx: false,
   shown: PAGE,
   open: new Set(),
 };
@@ -340,9 +362,11 @@ function compute() {
   const f = state.focus, dir = state.dir;
   const match = matcher(state.query);
   const idx = [];
+  const withEx = D.ex[state.domain] || {};
   for (let i = 0; i < dom.n; i++) {
     if (dom.dH[i] + dom.dG[i] + dom.dC[i] < state.minDocs) continue;
     if (!state.depths.has(dom.d[i])) continue;
+    if (state.onlyEx && !withEx[i]) continue;
     const z = scoreOf(dom, i, f, "z");
     if (z === null) continue;
     if (dir === "over" && !(z > 0)) continue;
@@ -488,8 +512,68 @@ function detailHTML(dom, i) {
 
   return `<div class="detailgrid"><div><div class="treebox">${treeSVG(dom.p[i])}</div>` +
     `<p class="legend">Dashed outline: any structure below that node is left out. Filled red nodes are clauses.</p></div>` +
-    `<div><table class="facts"><thead><tr><th></th><th>Occurrences</th><th>Documents using it</th><th>Rate per 1,000 tokens</th></tr></thead><tbody>${facts}</tbody></table>${family}` +
-    `<p class="note">Examples are not part of this version of the explorer.</p></div></div>`;
+    `<div><table class="facts"><thead><tr><th></th><th>Occurrences</th><th>Documents using it</th><th>Rate per 1,000 tokens</th></tr></thead><tbody>${facts}</tbody></table>${family}</div>` +
+    `${examplesHTML(dom, i)}</div>`;
+}
+
+// ---------- examples ----------
+const NOSPACE_BEFORE = /^(?:[,.;:!?%)\]}]|''|'s|'S|n't|N'T|'re|'ve|'ll|'d|'m|-RRB-|-RCB-|-RSB-)$/;
+const NOSPACE_AFTER = /^(?:[(\[{$#]|``|-LRB-|-LCB-|-LSB-)$/;
+const SHOWN = { "-LRB-": "(", "-RRB-": ")", "-LCB-": "{", "-RCB-": "}", "-LSB-": "[", "-RSB-": "]", "``": "\u201c", "''": "\u201d" };
+const glyph = (t) => (Object.prototype.hasOwnProperty.call(SHOWN, t) ? SHOWN[t] : t);
+const gap = (prev, tok) => (prev === undefined || NOSPACE_BEFORE.test(tok) || NOSPACE_AFTER.test(prev) ? "" : " ");
+
+function joinTokens(toks) {
+  let s = "";
+  toks.forEach((t, j) => { s += (j ? gap(toks[j - 1], t) : "") + esc(glyph(t)); });
+  return s;
+}
+
+const leafLabels = (p) => [...p.matchAll(/\(([^()\s]+)\)/g)].map((m) => m[1]);
+
+// one example: [sentence index, start, end, ...slot boundaries]
+function exampleHTML(e, labels) {
+  const [sid, start, end, ...bounds] = e;
+  const toks = D.sents[sid].split(" ");
+  const cuts = [start, ...bounds, end];
+  const CTX = 14;
+  const pre = toks.slice(Math.max(0, start - CTX), start);
+  const post = toks.slice(end, end + CTX);
+  let html = (start > CTX ? "\u2026 " : "") + (pre.length ? `<span class="ctx">${joinTokens(pre)}</span>` : "");
+  let prev = pre.length ? pre[pre.length - 1] : undefined;
+  for (let k = 0; k + 1 < cuts.length; k++) {
+    const seg = toks.slice(cuts[k], cuts[k + 1]);
+    if (!seg.length) continue;
+    const label = labels.length === cuts.length - 1 ? labels[k] : "";
+    // punctuation slots are their own label, so only name the others
+    const tag = /^[A-Z]/.test(label) ? `<span class="sl">${esc(label)}</span>` : "";
+    html += gap(prev, seg[0]) +
+      `<span class="slot ${kindOf(label)}">${tag}${joinTokens(seg)}</span>`;
+    prev = seg[seg.length - 1];
+  }
+  if (post.length) {
+    html += gap(prev, post[0]) + `<span class="ctx">${joinTokens(post)}</span>` + (end + CTX < toks.length ? " \u2026" : "");
+  }
+  return html;
+}
+
+function examplesHTML(dom, i) {
+  const byRow = (D.ex[state.domain] || {})[i];
+  if (!byRow) {
+    return `<div class="examples"><p class="note">No examples are embedded for this pattern. They cover the ${D.nCut} strongest patterns at each end of each ranking in a domain; rebuild with a larger --n-cut to include more.</p></div>`;
+  }
+  const sources = state.focus === "gpt" ? ["human", "gpt"] : state.focus === "claude" ? ["human", "claude"] : SOURCES;
+  const labels = leafLabels(dom.p[i]);
+  const blocks = sources.map((s) => {
+    const k = SRC_KEY[s];
+    const list = byRow[k] || [];
+    const total = dom["c" + k][i];
+    const body = list.length
+      ? list.map((e) => `<p class="ex">${exampleHTML(e, labels)}</p>`).join("")
+      : `<p class="noex">${total === 0 ? "This source never uses the pattern." : "No examples."}</p>`;
+    return `<div><h4><i class="dot ${s}"></i>${SRC_LABEL[s]}<small>${list.length} of ${num(total)} occurrences</small></h4>${body}</div>`;
+  }).join("");
+  return `<div class="examples"><p class="subhead">Examples</p><div class="exgrid">${blocks}</div></div>`;
 }
 
 function render() {
@@ -509,7 +593,7 @@ function render() {
 }
 
 function renderStatic() {
-  $("#lede").innerHTML = `Phrase-structure patterns from ${num(D.totals.docs)} documents of human, GPT and Claude writing, compared with human writing. Each row is a fragment of a parse tree, for example <code>(VP (VBD) (SBAR))</code>, and open rows show its structure.`;
+  $("#lede").innerHTML = `Phrase-structure patterns from ${num(D.totals.docs)} documents of human, GPT and Claude writing, compared with human writing. Each row is a fragment of a parse tree, for example <code>(VP (VBD) (SBAR))</code>, and open rows show its structure and example sentences.`;
   $("#floor").textContent = D.minDocs;
   $("#minDocs").min = D.minDocs;
   $("#minDocs").value = state.minDocs;
@@ -567,6 +651,7 @@ $("#depths").addEventListener("change", () => {
 });
 $("#query").addEventListener("input", (e) => { state.query = e.target.value; refresh(); });
 $("#fold").addEventListener("change", (e) => { state.fold = e.target.checked; refresh(); });
+$("#onlyEx").addEventListener("change", (e) => { state.onlyEx = e.target.checked; refresh(); });
 $("#delta").addEventListener("input", (e) => {
   const v = parseFloat(e.target.value);
   state.delta = Number.isFinite(v) && v >= 0 ? v : 0.3;
