@@ -1,6 +1,6 @@
 """Shannon entropy with Miller-Madow bias correction, for RQ1 Track 2.
 
-See docs/rq1_methodology.md §5.1-5.2 (Eq. 11-13) for the full specification,
+See docs/rq1_methodology.md §5.1 (Eq. 9-11) for the full specification,
 including why the plug-in estimator needs correcting here.
 Not a driver script -- imported by run_rq1_regularity.py, no __main__.
 """
@@ -10,7 +10,7 @@ import pandas as pd
 
 
 def plugin_entropy(proportions: pd.DataFrame) -> pd.Series:
-    """Computes the plug-in Shannon entropy per document (Eq. 12).
+    """Computes the plug-in Shannon entropy per document (Eq. 10).
 
     Ĥ = -Σ p_i ln(p_i). A zero-probability category should contribute
     exactly 0 to the sum (the true limit of p·ln(p) as p→0), but naive
@@ -20,10 +20,8 @@ def plugin_entropy(proportions: pd.DataFrame) -> pd.Series:
 
     Args:
         proportions (pd.DataFrame): (n_docs, D) -- just the p_* columns
-            for one composition, RAW (pre-replacement) proportions.
-            Entropy handles p=0 natively, so no multiplicative_replacement
-            is needed here (§5.1 step 1) -- this is exactly why Track 2
-            skips the step CLR requires.
+            for one composition, as raw proportions. Entropy handles p=0
+            natively, so no zero-replacement is needed (§5.1 step 1).
 
     Returns:
         pd.Series: Ĥ per document, same index as proportions.
@@ -36,7 +34,7 @@ def plugin_entropy(proportions: pd.DataFrame) -> pd.Series:
 
 
 def miller_madow(H_plugin: pd.Series, D: int, n: pd.Series) -> pd.Series:
-    """Applies the Miller-Madow bias correction to plug-in entropy (Eq. 13).
+    """Applies the Miller-Madow bias correction to plug-in entropy (Eq. 11).
 
     H_MM = Ĥ + (D-1)/(2n). The plug-in estimator is negatively biased for
     small samples -- rare categories are under-observed in few draws, so

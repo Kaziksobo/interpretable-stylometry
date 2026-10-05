@@ -27,7 +27,7 @@ Output schema (one row per sentence):
 
 from pathlib import Path
 
-import benepar
+import benepar  # noqa: F401 - registers the "benepar" spaCy pipeline component
 import pandas as pd
 import spacy
 from tqdm import tqdm

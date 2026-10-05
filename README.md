@@ -6,8 +6,9 @@ Research code for a micro-placement project supervised by Dr Paul Nulty (Birkbec
 
 Computational stylometry has optimised relentlessly for discriminative accuracy - the ability to tell authors apart, or to detect AI-generated text - at the expense of interpretability. This project addresses that gap by developing syntactic, lexical, and prosodic features that can *explain* how AI-generated prose differs from human writing, rather than merely detecting it.
 
-The analysis is structured around three research questions:
+The analysis is structured around four research questions:
 
+- **RQ0:** Do humans, GPT and Claude use each sentence type and structure at different rates?
 - **RQ1:** Does AI prose show reduced variance and greater regularity across interpretable syntactic features (loose/periodic sentences, clause complexity) compared to human prose?
 - **RQ2:** Does LLM-generated prose show a regularisation in rhythm (sentence length variance, cadence, stress patterns) analogous to what Heuser (2025) found in verse?
 - **RQ3:** Does instruction tuning amplify formal conservatism in AI prose, as it does in AI verse?
@@ -16,10 +17,13 @@ A full literature review motivating these questions is available in `docs/`.
 
 ## Current Status
 
-**RQ1 - In progress**. Two parallel analysis tracks are complete:
+**RQ0 - Complete**. Mean rate of each Feng et al. (2012) sentence type (SIMPLE/COMPLEX/COMPOUND/COMPLEX-COMPOUND/OTHER) and structure (LOOSE/PERIODIC/OTHER) per document, averaged per domain and source with 95% intervals. Charts in `results/rq0/`; method in `docs/rq0_methodology.md`.
 
-- **Theory-driven (Feng features)**: Constituency parsing and per-sentence classification of sentence type (SIMPLE/COMPLEX/COMPOUND/COMPLEX-COMPOUND) and structure (LOOSE/PERIODIC) using Feng et al. (2012). Formal dispersion and location testing (Brown-Forsythe, Mann-Whitney U, Benjamini-Hochberg FDR correction) across all three domains and both AI models. Results in `results/rq1_significance.txt`.
-- **Data-driven (syntactic motif mining)**: Bottom-up discovery of discriminatory phrase-structure patterns using induced subtree extraction from constituency parses. PMI-based comparison of GPT and Claude against human baseline, with categorical absence detection. Results in `results/stylometric_report.txt`. Formal dispersion testing on candidate motif patterns is the immediate next step.
+**RQ1 - In progress**.
+
+- **Track 1 (between-document variance) - complete**: per category, the variance of document rates with each document's sampling noise removed, relative to its maximum possible; uncertainty by resampling (whole authors for Reuters); human vs AI z-tests with Benjamini-Hochberg FDR correction. Charts in `results/rq1/`; method, verification and results in `docs/rq1_methodology.md`.
+- **Track 2 (within-document regularity) - under review**.
+- **Data-driven (syntactic motif mining)**: Bottom-up discovery of discriminatory phrase-structure patterns using induced subtree extraction from constituency parses. PMI-based comparison of GPT and Claude against human baseline, with categorical absence detection. Results in `results/motifs/stylometric_report.txt`.
 
 **RQ2 - Not yet started**. Dependency parses are available; prosodic feature extraction is pending.
 
@@ -31,39 +35,63 @@ A full literature review motivating these questions is available in `docs/`.
 └── 📁interpretable-stylometry
     └── 📁data
         └── 📁processed
-            ├── constituency_features.feather
-            ├── constituency_parses.feather
             ├── corpus.feather
-            ├── dependency_parses.bak.feather
-            ├── dependency_parses.feather
-            ├── doc_features.feather
+            └── 📁features
+                ├── constituency_features.feather
+                ├── doc_features.feather
+            └── 📁parses
+                ├── constituency_parses.feather
+                ├── dependency_parses.bak.feather
+                ├── dependency_parses.feather
+            └── 📁rq1
+                ├── doc_entropy.feather
         └── 📁raw
     └── 📁docs
+        ├── rq0_methodology.md
+        ├── rq1_methodology.md
         ├── stylometry-litreview.pdf
     └── 📁notebooks
         ├── constituency_analysis.ipynb
         ├── feng_algorithm_dev.ipynb
         ├── ghostbuster_exploratory_analysis.ipynb
     └── 📁results
-        ├── ghostbuster_sentence_metrics.png
-        ├── ghostbuster_sentence_stats.csv
-        ├── ghostbuster_word_count_distributions.png
-        ├── ghostbuster_word_count_stats.csv
-        ├── rq1_significance.csv
-        ├── rq1_significance.txt
-        ├── stylometric_report.txt
+        └── 📁exploratory
+            ├── ghostbuster_sentence_metrics.png
+            ├── ghostbuster_sentence_stats.csv
+            ├── ghostbuster_word_count_distributions.png
+            ├── ghostbuster_word_count_stats.csv
+        └── 📁motifs
+            ├── stylometric_report.txt
+        └── 📁rq0
+            ├── rq0_rates.csv
+            ├── rq0_rates_{essay,reuter,wp}.{png,pdf}
+        └── 📁rq1
+            ├── rq1_regularity_significance.csv
+            ├── rq1_variance.csv
+            ├── rq1_variance_tests.csv
+            ├── rq1_variance_tests_sensitivity.csv
+            ├── rq1_variance_{essay,reuter,wp}.{png,pdf}
     └── 📁src
         └── 📁analysis
-            └── 📁__pycache__
-                ├── analyze_corpus.cpython-312.pyc
-                ├── mining.cpython-312.pyc
-            ├── analyze_corpus.py
-            ├── build_constituency_features.py
-            ├── build_doc_features.py
-            ├── feng_classifiers.py
-            ├── mining.py
-            ├── run_feature_analysis.py
-            ├── run_rq1_significance.py
+            └── 📁features
+                ├── build_doc_features.py
+                ├── feng_classifiers.py
+            └── 📁motifs
+                ├── analyze_corpus.py
+                ├── mining.py
+                ├── run_feature_analysis.py
+            └── 📁rq0
+                ├── plot_rq0.py
+                ├── run_rq0.py
+            └── 📁rq1
+                ├── compositions.py
+                ├── entropy.py
+                ├── plot_rq1_variance.py
+                ├── run_rq1_regularity.py
+                ├── run_rq1_variance.py
+            └── 📁shared
+                ├── filters.py
+                ├── significance_utils.py
         └── 📁parsing
             ├── constituency_parse.py
             ├── dependency_parse.py

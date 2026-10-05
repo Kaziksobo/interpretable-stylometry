@@ -3,15 +3,15 @@
 Tests whether a single AI-generated document spreads across recognised
 sentence types/structures more or less evenly than a human document does.
 
-See docs/rq1_methodology.md §5 for the full pipeline (Eq. 11-13) and §9.2,
-§9.4 for exact output schemas.
+See docs/rq1_methodology.md §5 for the full pipeline (Eq. 9-11) and §10.5
+for exact output schemas.
 
 Inputs:
-    data/processed/rq1/doc_features.feather
+    data/processed/features/doc_features.feather
 
 Outputs:
     data/processed/rq1/doc_entropy.feather
-    results/rq1/rq1_regularity_significance.csv   -- RQ1 answer file
+    results/rq1/rq1_regularity_significance.csv   -- Track 2, under review
 """
 
 from pathlib import Path
@@ -53,18 +53,15 @@ COMPOSITIONS: list[tuple[str, Callable]] = [
 
 
 def _process_composition(df, proportions_fn, composition_name) -> CompositionResult:
-    """Runs the full Track 2 pipeline for one composition (§5.1 steps 1-7).
+    """Runs the full Track 2 pipeline for one composition (§5.1 steps 1-5).
 
     Reuses compute_proportions_algo1/2 from compositions.py purely for
     its proportions and `denom` output -- `denom` is exactly the
-    composition-specific `n` Eq. 13's bias correction needs, so no
-    separate computation is required. No zero-replacement or CLR step
-    here: entropy handles p=0 natively, which is the whole reason Track
-    2 can skip what Track 1 needs. Finishes the same way as Track 1 --
-    Mann-Whitney per domain, human vs. each AI source -- but on entropy
-    values instead of distances, with a ratio above 1 (not below)
-    supporting "greater regularity" here, since it means lower AI
-    entropy.
+    composition-specific `n` Eq. 11's bias correction needs, so no
+    separate computation is required. No zero-replacement is needed:
+    entropy handles p=0 natively. Mann-Whitney per domain, human vs.
+    each AI source, on the corrected entropies; a ratio above 1 supports
+    "greater regularity", since it means lower AI entropy.
 
     Args:
         df (pd.DataFrame): Filtered doc_features, shared across both
@@ -78,7 +75,7 @@ def _process_composition(df, proportions_fn, composition_name) -> CompositionRes
     Returns:
         CompositionResult: This composition's contribution to
             doc_entropy.feather and rq1_regularity_significance.csv
-            (§9.2, §9.4). No file I/O happens here -- main() concatenates
+            (§10.5). No file I/O happens here -- main() concatenates
             each field across both compositions and writes the combined
             result once.
     """
@@ -142,7 +139,7 @@ def main():
     FDR correction is applied once, here, on the concatenated 12-row
     significance frame across both compositions -- not inside
     _process_composition, which would correct over 6 tests per call
-    instead of the 12-test family §7 specifies.
+    instead of the 12-test family §8 specifies.
     """
     df = filter_min_sents(pd.read_feather(INPUT_PATH))
     results = [_process_composition(df, fn, name) for name, fn in COMPOSITIONS]

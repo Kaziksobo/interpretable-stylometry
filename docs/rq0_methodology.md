@@ -19,10 +19,14 @@
 - Per domain (essay, reuter, wp), per category (8), per source (human, GPT, Claude)
 - Output: one bar chart per domain — mean rate per category and source, with 95% error bars
 
-## 3. Data
+## 3. Data, Cleaning & Filtering
 
-- Input: `data/processed/rq1/doc_features.feather` — per-document Feng category counts and `n_sents`
-- Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 8,954 documents, 987–1,002 per group; same starting pool as RQ1
+- Input: `data/processed/features/doc_features.feather` — per-document Feng category counts and `n_sents`, built by `src/analysis/features/build_doc_features.py`
+- Two cleaning rules, applied to sentences before aggregation (shared with RQ1):
+  - **Sentences with no letters dropped** — 2,459 (lone `"` 1,406 times; also `.`, `*`, list numbers): sentence-splitter artefacts, all labelled OTHER. They were 6–69% of a group's type-OTHER sentences (reuter GPT 69%, Claude 63%)
+  - **Reuter sentences with no author dropped** — 108: orphans the author fix couldn't assign, which formed 43 pseudo-documents of 1–6 sentences
+  - Effect on RQ0: reuter AI type OTHER fell from 1.8% to 0.6% (GPT) and 1.9% to 0.8% (Claude) — about two-thirds artefact; reuter type OTHER reversed order (human now highest)
+- Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 42 documents excluded (0.47%) → **8,949 documents, 987–1,000 per group**; same pool as RQ1
 - Denominator is `n_sents` for every category, both `OTHER`s included
 - Each scheme's counts sum to `n_sents` in every document (asserted in `build_doc_features.py`), so each document's rates within a scheme sum to exactly 1
 
@@ -60,29 +64,29 @@
 
   $$\text{Var}(r) = \underbrace{\text{Var}(p)}_{\text{real spread}} + \underbrace{E\!\left[\varepsilon^2\right]}_{\text{noise, always } > 0} \tag{5}$$
 
-- Observed spread always overstates real spread, more so for shorter documents — which is why RQ1 needs a model to separate the two terms, and RQ0 doesn't
+- Observed spread always overstates real spread, more so for shorter documents — which is why RQ1 needs to separate the two terms (RQ1 methodology §4), and RQ0 doesn't
 
-### 5.3 Checked against the alternatives
+### 5.3 Checked against the alternatives (cleaned data)
 
-- **Full Beta-binomial model** (weights documents by `n_i/(1+(n_i−1)ρ)`): Eq. 2 is within 0.95 pp of it at worst, 0.22 pp in a typical cell; error bars (Eq. 3) are ±0.21 to ±1.00 pp
-  - 2 of 24 bar groups swap order between the two — only possible between bars closer than the methods ever differ (< 1 pp), i.e. within the error bars either way
-  - The model only tightens error bars slightly; it doesn't change the answer — reserved for RQ1
+- **Full Beta-binomial model** (weights documents by `n_i/(1+(n_i−1)ρ)`): Eq. 2 is within 0.93 pp of it at worst, 0.23 pp in a typical cell; error bars (Eq. 3) are ±0.11 to ±1.00 pp
+  - No bar group changes order between the two
+  - The model only tightens error bars slightly; it doesn't change the answer
 - **Pooling** (sum `k_i` over sum `n_i`) weights by sentence, so a few very long documents dominate — unevenly by source:
 
 | Domain | Human: median / max sentences / longest 5% of docs' share of sentences | GPT | Claude |
 |---|---|---|---|
-| essay | 22 / 365 / **20%** | 28 / 80 / 9% | 22 / 45 / 8% |
-| reuter | 20 / 53 / 9% | 22 / 46 / 8% | 18 / 31 / 7% |
-| wp | 38 / 235 / **15%** | 32 / 143 / 9% | 32 / 100 / 9% |
+| essay | 22 / 363 / **20%** | 28 / 73 / 9% | 22 / 45 / 8% |
+| reuter | 20 / 51 / 9% | 21 / 46 / 8% | 18 / 30 / 7% |
+| wp | 37 / 225 / **15%** | 32 / 90 / 9% | 32 / 96 / 9% |
 
   - Pooled human bars would describe how humans write very long essays; AI bars would describe typical documents
-  - Pooled vs Eq. 2: max gap 2.51 pp, median 0.42 pp; human/GPT/Claude order flips in 3 of 24 bar groups (essay struct OTHER, reuter struct OTHER, wp SIMPLE)
+  - Pooled vs Eq. 2: max gap 2.39 pp, median 0.38 pp; human/GPT/Claude order flips in 1 of 24 bar groups (essay structure OTHER)
 
 ## 6. Pipeline
 
 ### 6.1 `src/analysis/rq0/run_rq0.py`
 
-- **Step 1**: load `doc_features.feather`, `filter_min_sents` → 8,954 documents
+- **Step 1**: load `doc_features.feather`, `filter_min_sents` → 8,949 documents
 - **Step 2**: on a copy, convert each category count to a rate (Eq. 1) — overwrite the count columns so nothing downstream can read counts by mistake
 - **Step 3**: per (domain, source, category): `n_docs`, mean (Eq. 2), SE and interval (Eq. 3) — 72 rows
 - **Step 4**: assert 72 rows; each (domain, source, scheme)'s mean rates sum to 1; every `ci_low ≥ 0`
@@ -92,7 +96,7 @@
 
 - **Step 1**: read `rq0_rates.csv` — no recomputation, so charts can be restyled freely
 - **Step 2**: one figure per domain, two panels (`sentence_type`, 5 categories; `sentence_structure`, 3; width ratios 5:3)
-- **Step 3**: grouped bars human / GPT / Claude per category, in a fixed category order; one colour per source, the same in every figure; y-axis in % of sentences
+- **Step 3**: grouped bars human / GPT / Claude per category, in a fixed category order; one colour per source (Okabe-Ito), the same in every figure; y-axis in % of sentences
 - **Step 4**: error bars = 1.96 × SE
 - **Step 5**: save PNG (viewing) and PDF (vector, for the LaTeX write-up)
 
@@ -116,6 +120,6 @@
 
 ## 8. Limitations & Notes
 
-- **Reuters author clustering**: human reuter is 50 authors × ~20 documents; same-author documents are correlated, so reuter error bars are somewhat too narrow. Affects RQ1 equally
+- **Reuters author clustering**: human reuter is 50 authors × ~20 documents; same-author documents are correlated, so reuter error bars are somewhat too narrow. RQ1 resamples whole authors for this reason (RQ1 methodology §4.3); RQ0's error bars are descriptive only
 - **No formal test**: RQ0 is descriptive; the error bars show which gaps are clear. If a test is wanted later, Welch's t-test on the document rates matches this method — it compares means directly
-- **For the RQ1 rebuild**: Track 3's location test (Mann-Whitney) is not a test of rates. Simulated with the same true rate in both groups, each keeping its real variance and lengths, it flagged a difference in 100% of runs for essay OTHER, human vs GPT (Beta-binomial LR: 3%) — GPT's documents are more spread out, so more sit at 0% at the same mean, and Mann-Whitney detects that shape difference. Its `pure_regularisation` flag and the "Strongest location difference" lines in `rq1_answer.txt` rest on it
+- **Why not Mann-Whitney** (the test the retired RQ1 Track 3 used for "location"): it isn't a test of rates. Simulated with the same true rate in both groups, each keeping its real variance and lengths, it flagged a difference in 100% of runs for essay OTHER, human vs GPT (Beta-binomial LR: 3%) — GPT's documents are more spread out, so more sit at 0% at the same mean, and Mann-Whitney detects that shape difference
