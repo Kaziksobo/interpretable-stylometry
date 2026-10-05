@@ -4,6 +4,10 @@ Counts every induced-subtree pattern (depth 2-4, at least two countable leaves;
 see mining.count_patterns) in every sentence and aggregates per document, on
 the same document pool as RQ0 and RQ1 (shared/filters.py). Counts are
 occurrences: a pattern that occurs at two nodes of one sentence counts twice.
+Each parse tree is first cleaned of the empty nodes that whitespace tokens
+leave behind (mining.remove_empty_nodes); without that, patterns would contain
+slots with no word in them, and they are far commoner in some sources than
+others.
 
 Three tables linked by integer ids, in long (sparse) format because a document
 uses only a small fraction of the pattern vocabulary:
@@ -43,7 +47,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from mining import count_patterns
+from mining import count_patterns, remove_empty_nodes
 from nltk import Tree
 from tqdm import tqdm
 
@@ -95,6 +99,10 @@ def _count_chunk(
             try:
                 tree = Tree.fromstring(parse_str)
             except ValueError:
+                n_failed += 1
+                continue
+            tree = remove_empty_nodes(tree)
+            if tree is None:  # no words at all
                 n_failed += 1
                 continue
             doc_counts.update(

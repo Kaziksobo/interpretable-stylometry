@@ -348,15 +348,16 @@ def pattern_depth(pattern: str) -> int:
 
 def find_patterns_with_spans(
     tree: Tree, max_depth: int = 4, min_depth: int = 2, min_terminals: int = 2
-) -> list[tuple[str, int, int]]:
+) -> list[tuple[str, int, int, tuple[int, ...]]]:
     """
-    Find every pattern occurrence in one parse tree, with its token span.
+    Find every pattern occurrence in one parse tree, with its token spans.
 
     Finds exactly the occurrences that count_patterns counts (same patterns,
     same per-node de-duplication), but returns each one with the span of
-    tokens that the pattern's root node covers. A constituent always covers a
-    contiguous run of tokens, so the span is all that is needed to mark the
-    pattern in the sentence.
+    tokens that the pattern's root node covers, and where the pattern's own
+    leaf slots fall within that span. A constituent always covers a contiguous
+    run of tokens, and the pattern's leaves partition it, so a span plus the
+    slot boundaries is all that is needed to mark the pattern in the sentence.
 
     Args:
         tree: NLTK Tree (full constituency parse)
@@ -365,10 +366,13 @@ def find_patterns_with_spans(
         min_terminals: Minimum number of countable leaf nodes in the pattern
 
     Returns:
-        One (pattern, start, end) per occurrence, where tree.leaves()[start:end]
-        are the tokens under the pattern's root node
+        One (pattern, start, end, bounds) per occurrence. tree.leaves()[start:end]
+        are the tokens under the pattern's root node, and bounds are the token
+        indices where one leaf slot ends and the next begins, so the slots (in
+        the order the leaves appear in the pattern string) are
+        [start, bounds[0]), [bounds[0], bounds[1]), ..., [bounds[-1], end)
     """
-    found: list[tuple[str, int, int]] = []
+    found: list[tuple[str, int, int, tuple[int, ...]]] = []
     _find_node(tree, 0, max_depth, min_depth, min_terminals, found)
     return found
 
@@ -379,8 +383,8 @@ def _find_node(
     max_depth: int,
     min_depth: int,
     min_terminals: int,
-    found: list[tuple[str, int, int]],
-) -> tuple[list[tuple[str, int]], int]:
+    found: list[tuple[str, int, int, tuple[int, ...]]],
+) -> tuple[list[tuple[str, int, tuple[int, ...]]], int]:
     """
     Collect the pattern occurrences rooted at node and below, with spans.
 
@@ -393,11 +397,12 @@ def _find_node(
         max_depth: Maximum subtree depth
         min_depth: Minimum subtree depth
         min_terminals: Minimum number of countable leaf nodes in the pattern
-        found: List extended in place with (pattern, start, end) occurrences
+        found: List extended in place with (pattern, start, end, bounds)
+            occurrences
 
     Returns:
-        node's (pattern string, countable leaf count) form at each depth
-        1..max_depth, and the index one past its last token
+        node's (pattern string, countable leaf count, slot end indices) form at
+        each depth 1..max_depth, and the index one past its last token
     """
     label = node.label()
     leaf_form = (f"({label})", int(_COUNTABLE_LABEL.fullmatch(label) is not None))
@@ -413,22 +418,66 @@ def _find_node(
         else:
             end += 1  # a word, directly under this node
 
+    leaf = (leaf_form[0], leaf_form[1], (end,))
     if not child_forms:
-        forms = [leaf_form] * max_depth
+        forms = [leaf] * max_depth
     else:
-        forms = [leaf_form]
+        forms = [leaf]
         for depth in range(2, max_depth + 1):
             kids = [cf[depth - 2] for cf in child_forms]
             pattern = f"({label} {' '.join(k[0] for k in kids)})"
-            forms.append((pattern, sum(k[1] for k in kids)))
+            slot_ends = tuple(e for k in kids for e in k[2])
+            forms.append((pattern, sum(k[1] for k in kids), slot_ends))
 
     seen_at_this_node = set()
     for depth in range(min_depth, max_depth + 1):
-        pattern, n_terminals = forms[depth - 1]
+        pattern, n_terminals, slot_ends = forms[depth - 1]
         if pattern in seen_at_this_node:
             continue
         seen_at_this_node.add(pattern)
         if n_terminals >= min_terminals:
-            found.append((pattern, start, end))
+            found.append((pattern, start, end, slot_ends[:-1]))
 
     return forms, end
+
+
+def remove_empty_nodes(tree: Tree) -> Tree | None:
+    """
+    Remove the nodes that whitespace tokens leave behind in a parse tree.
+
+    The parser tags newline and other whitespace-only tokens like any other
+    token, but reading the bracketed string back drops the whitespace, leaving
+    a preterminal with no word under it, e.g. "(PRP \\n)". Such a node, and any
+    ancestor left with no words, is removed. If that leaves an X node with a
+    single X child, the node is contracted into the child, since the unary
+    chain is only the stump of a removed node: (NP (NP (PRP \\n)) (NP (PRP He)))
+    becomes (NP (PRP He)). Unary chains the parser itself produced, such as
+    (NP (NP (PRP it))), are left alone, since only nodes that lost a child are
+    contracted.
+
+    Trees with no empty nodes are returned with the same structure.
+
+    Args:
+        tree: NLTK Tree (full constituency parse), or a leaf string
+
+    Returns:
+        The cleaned tree, or None if no word is left under it
+    """
+    if not isinstance(tree, Tree):
+        return tree
+
+    children = []
+    for child in tree:
+        cleaned = remove_empty_nodes(child)
+        if cleaned is not None:
+            children.append(cleaned)
+    if not children:
+        return None
+    if (
+        len(children) < len(tree)  # the node lost a child
+        and len(children) == 1
+        and isinstance(children[0], Tree)
+        and children[0].label() == tree.label()
+    ):
+        return children[0]
+    return Tree(tree.label(), children)

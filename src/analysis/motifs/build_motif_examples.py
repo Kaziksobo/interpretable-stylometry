@@ -16,7 +16,9 @@ first ones met.
 
 Sentences are stored once, as space-separated parse tokens (so punctuation is
 a token, and brackets appear as -LRB- and -RRB-), and examples refer to them by
-sent_id. Spans index into those tokens.
+sent_id. Spans index into those tokens. Each example also records where the
+pattern's own leaf slots fall inside its span, so a pattern that covers a whole
+sentence can still be shown as labelled segments.
 
 Inputs:
     data/processed/parses/constituency_parses.feather
@@ -34,6 +36,10 @@ Outputs:
         rank           : int8  - 0 is the first example to show
         sent_id        : int32
         start, end     : int16 - tokens[start:end] are the pattern's tokens
+        bounds         : str   - comma-separated token indices where one slot
+                         of the pattern ends and the next begins; with the
+                         pattern's leaf labels in order, the slots are
+                         [start, b0), [b0, b1), ..., [b_last, end)
 
 Usage (from the project root):
     python src/analysis/motifs/build_motif_examples.py
@@ -48,7 +54,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from build_motif_counts import MAX_DEPTH, MIN_DEPTH, MIN_TERMINALS
-from mining import find_patterns_with_spans
+from mining import find_patterns_with_spans, remove_empty_nodes
 from nltk import Tree
 from tqdm import tqdm
 
@@ -99,8 +105,8 @@ def _process_chunk(
             parse string) per sentence.
 
     Returns:
-        tuple: The N_EXAMPLES lowest-priority (priority, sent_id, start, end)
-            per (domain, source, pattern) within this chunk; (sent_id,
+        tuple: The N_EXAMPLES lowest-priority (priority, sent_id, start, end,
+            bounds) per (domain, source, pattern) within this chunk; (sent_id,
             tokens, n_tokens) per sentence; and the number of parse strings
             that failed to parse.
 
@@ -118,6 +124,10 @@ def _process_chunk(
         except ValueError:
             n_failed += 1
             continue
+        tree = remove_empty_nodes(tree)  # same cleaning as build_motif_counts
+        if tree is None:  # no words at all
+            n_failed += 1
+            continue
 
         tokens = tree.leaves()
         joined = " ".join(tokens)
@@ -126,16 +136,18 @@ def _process_chunk(
         sentences.append((sent_id, joined, len(tokens)))
 
         kept = _kept[domain]
-        first: dict[str, tuple[int, int]] = {}
-        for pattern, start, end in find_patterns_with_spans(
+        first: dict[str, tuple[int, int, tuple[int, ...]]] = {}
+        for pattern, start, end, bounds in find_patterns_with_spans(
             tree, MAX_DEPTH, MIN_DEPTH, MIN_TERMINALS
         ):
-            if pattern in kept and (pattern not in first or (start, end) < first[pattern]):
-                first[pattern] = (start, end)
+            if pattern in kept and (
+                pattern not in first or (start, end) < first[pattern][:2]
+            ):
+                first[pattern] = (start, end, bounds)
 
-        for pattern, (start, end) in first.items():
+        for pattern, (start, end, bounds) in first.items():
             examples[(domain, source, pattern)].append(
-                (_priority(sent_id, pattern), sent_id, start, end)
+                (_priority(sent_id, pattern), sent_id, start, end, bounds)
             )
 
     trimmed = {
@@ -243,13 +255,33 @@ def main() -> None:
     records = []
     for (domain, source, pattern), entries in sorted(sampled.items()):
         pattern_id = pattern_ids[pattern]
-        for rank, (_, sent_id, start, end) in enumerate(
+        for rank, (_, sent_id, start, end, bounds) in enumerate(
             heapq.nsmallest(N_EXAMPLES, entries)
         ):
-            records.append((domain, source, pattern_id, rank, sent_id, start, end))
+            records.append(
+                (
+                    domain,
+                    source,
+                    pattern_id,
+                    rank,
+                    sent_id,
+                    start,
+                    end,
+                    ",".join(map(str, bounds)),
+                )
+            )
     examples = pd.DataFrame(
         records,
-        columns=["domain", "source", "pattern_id", "rank", "sent_id", "start", "end"],
+        columns=[
+            "domain",
+            "source",
+            "pattern_id",
+            "rank",
+            "sent_id",
+            "start",
+            "end",
+            "bounds",
+        ],
     ).astype(
         {
             "domain": "category",
