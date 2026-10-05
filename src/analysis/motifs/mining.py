@@ -344,3 +344,91 @@ def pattern_depth(pattern: str) -> int:
         elif char == ")":
             level -= 1
     return deepest
+
+
+def find_patterns_with_spans(
+    tree: Tree, max_depth: int = 4, min_depth: int = 2, min_terminals: int = 2
+) -> list[tuple[str, int, int]]:
+    """
+    Find every pattern occurrence in one parse tree, with its token span.
+
+    Finds exactly the occurrences that count_patterns counts (same patterns,
+    same per-node de-duplication), but returns each one with the span of
+    tokens that the pattern's root node covers. A constituent always covers a
+    contiguous run of tokens, so the span is all that is needed to mark the
+    pattern in the sentence.
+
+    Args:
+        tree: NLTK Tree (full constituency parse)
+        max_depth: Maximum subtree depth
+        min_depth: Minimum subtree depth (default 2 excludes single tags)
+        min_terminals: Minimum number of countable leaf nodes in the pattern
+
+    Returns:
+        One (pattern, start, end) per occurrence, where tree.leaves()[start:end]
+        are the tokens under the pattern's root node
+    """
+    found: list[tuple[str, int, int]] = []
+    _find_node(tree, 0, max_depth, min_depth, min_terminals, found)
+    return found
+
+
+def _find_node(
+    node: Tree,
+    start: int,
+    max_depth: int,
+    min_depth: int,
+    min_terminals: int,
+    found: list[tuple[str, int, int]],
+) -> tuple[list[tuple[str, int]], int]:
+    """
+    Collect the pattern occurrences rooted at node and below, with spans.
+
+    Mirrors _count_node, with the addition of tracking which tokens each node
+    covers.
+
+    Args:
+        node: Subtree to process
+        start: Index of the first token under node
+        max_depth: Maximum subtree depth
+        min_depth: Minimum subtree depth
+        min_terminals: Minimum number of countable leaf nodes in the pattern
+        found: List extended in place with (pattern, start, end) occurrences
+
+    Returns:
+        node's (pattern string, countable leaf count) form at each depth
+        1..max_depth, and the index one past its last token
+    """
+    label = node.label()
+    leaf_form = (f"({label})", int(_COUNTABLE_LABEL.fullmatch(label) is not None))
+
+    child_forms = []
+    end = start
+    for child in node:
+        if isinstance(child, Tree):
+            child_form, end = _find_node(
+                child, end, max_depth, min_depth, min_terminals, found
+            )
+            child_forms.append(child_form)
+        else:
+            end += 1  # a word, directly under this node
+
+    if not child_forms:
+        forms = [leaf_form] * max_depth
+    else:
+        forms = [leaf_form]
+        for depth in range(2, max_depth + 1):
+            kids = [cf[depth - 2] for cf in child_forms]
+            pattern = f"({label} {' '.join(k[0] for k in kids)})"
+            forms.append((pattern, sum(k[1] for k in kids)))
+
+    seen_at_this_node = set()
+    for depth in range(min_depth, max_depth + 1):
+        pattern, n_terminals = forms[depth - 1]
+        if pattern in seen_at_this_node:
+            continue
+        seen_at_this_node.add(pattern)
+        if n_terminals >= min_terminals:
+            found.append((pattern, start, end))
+
+    return forms, end
