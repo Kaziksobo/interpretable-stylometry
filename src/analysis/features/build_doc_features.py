@@ -25,6 +25,8 @@ from pathlib import Path
 
 import pandas as pd
 
+from src.analysis.shared.filters import NO_AUTHOR, drop_junk_sentences
+
 PROJECT_ROOT = next(
     p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
 )
@@ -47,19 +49,12 @@ def main() -> None:
             "Run build_constituency_features.py first."
         )
 
-    # Removing Sentences with no letters
-    has_letters = df["sent_text"].str.contains(r"[^\W\d_]", regex=True, na=False)
-
-    # Removing Reuter sentences with no author
-    reuter_orphan = (df["domain"] == "reuter") & df["author"].isna()
-
-    print(f"  dropping {(~has_letters).sum():,} sentences with no letters")
-    print(f"  dropping {reuter_orphan.sum():,} reuter sentences with no author")
-    df = df[has_letters & ~reuter_orphan].reset_index(drop=True)
+    # Shared cleaning rules (letterless sentences, orphaned Reuters rows)
+    df = drop_junk_sentences(df)
     print(f"  {len(df):,} sentences remain")
 
     # Replace None author with placeholder so groupby doesn't drop essay/wp rows
-    df["author"] = df["author"].fillna("__none__")
+    df["author"] = df["author"].fillna(NO_AUTHOR)
 
     # Use get_dummies + groupby sum - avoids type inference issues from
     # value_counts().unstack() and produces integer counts directly.
@@ -135,7 +130,7 @@ def main() -> None:
         )
 
     # Restore None author for essay/wp (cleaner than storing "__none__" on disk)
-    doc_df["author"] = doc_df["author"].replace("__none__", None)
+    doc_df["author"] = doc_df["author"].replace(NO_AUTHOR, None)
 
     print("\nDocument counts per domain/source:")
     print(doc_df.groupby(["domain", "source"]).size().to_string())

@@ -10,6 +10,12 @@ from mining import extract_patterns_with_examples
 from nltk import Tree
 from tqdm import tqdm
 
+from src.analysis.shared.filters import (
+    drop_junk_sentences,
+    filter_min_sents,
+    restrict_to_docs,
+)
+
 
 def _process_chunk_with_examples(
     pairs: list[tuple[str, str]],
@@ -243,10 +249,20 @@ def main():
     INPUT_PATH = (
         PROJECT_ROOT / "data" / "processed" / "parses" / "constituency_parses.feather"
     )
+    DOC_FEATURES_PATH = (
+        PROJECT_ROOT / "data" / "processed" / "features" / "doc_features.feather"
+    )
     OUTPUT_PATH = PROJECT_ROOT / "results" / "motifs" / "stylometric_report.txt"
     print("Loading Feather file...")
-    # Update to your actual dataset file path
     df = pd.read_feather(INPUT_PATH)
+    print(f"  {len(df):,} sentences")
+
+    # Same document pool as RQ0 and RQ1: drop junk sentences, then keep only the
+    # documents that survive the minimum-sentence filter
+    df = drop_junk_sentences(df)
+    docs = filter_min_sents(pd.read_feather(DOC_FEATURES_PATH))
+    df = restrict_to_docs(df, docs)
+    print(f"  {len(df):,} sentences remain in {len(docs):,} documents")
 
     PARSE_COL = "parse_str"
     TEXT_COL = "sent_text"
