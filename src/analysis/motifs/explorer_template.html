@@ -1,0 +1,601 @@
+<!doctype html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Syntactic patterns in human and AI prose</title>
+<style>
+:root {
+  --paper: #f3f5f7;
+  --panel: #ffffff;
+  --ink: #16202a;
+  --muted: #5b6773;
+  --rule: #d9dfe5;
+  --wash: #e9eef2;
+  --focus: #2b59c3;
+  --clause: #9b2d43;
+  --human: #0072b2;
+  --gpt: #e69f00;
+  --claude: #009e73;
+  --human-text: #005a8d;
+  --gpt-text: #8a5a00;
+  --claude-text: #00755a;
+  --sans: "Segoe UI Variable Text", "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --serif: "Iowan Old Style", "Palatino Linotype", Palatino, "Book Antiqua", Georgia, serif;
+  --mono: "Cascadia Mono", "SF Mono", ui-monospace, Consolas, "Liberation Mono", monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #10161c;
+    --panel: #17202a;
+    --ink: #e6ecf1;
+    --muted: #93a1ae;
+    --rule: #2a3642;
+    --wash: #1d2833;
+    --focus: #7da2ff;
+    --clause: #e0788d;
+    --human-text: #5db4ec;
+    --gpt-text: #f0b73d;
+    --claude-text: #3dc9a2;
+  }
+}
+* { box-sizing: border-box; }
+html { background: var(--paper); color: var(--ink); font: 15px/1.5 var(--sans); }
+body { margin: 0; padding: 0 0 4rem; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+.page { max-width: 1280px; margin: 0 auto; padding: 0 1.5rem; }
+header.top { padding: 2rem 0 1rem; max-width: 68ch; }
+h1 { font: 600 1.9rem/1.2 var(--serif); margin: 0 0 .5rem; letter-spacing: -.01em; }
+.lede { margin: 0; color: var(--muted); }
+.lede code, .help code { font: .9em var(--mono); color: var(--ink); }
+
+.controls { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: .9rem 0; margin-top: 1rem; display: grid; gap: .8rem 2rem; grid-template-columns: repeat(auto-fit, minmax(160px, max-content)); align-items: end; }
+.controls > * { min-width: 0; }
+.field { display: grid; gap: .25rem; }
+.field > span, fieldset legend { font-size: .85rem; color: var(--muted); padding: 0; }
+fieldset { border: 0; margin: 0; padding: 0; display: grid; gap: .25rem; min-width: 0; }
+.seg { display: inline-flex; justify-self: start; border: 1px solid var(--rule); border-radius: 6px; overflow: hidden; background: var(--panel); }
+.seg button { font: inherit; color: inherit; background: transparent; border: 0; border-right: 1px solid var(--rule); padding: .35rem .75rem; cursor: pointer; white-space: nowrap; }
+.seg button:last-child { border-right: 0; }
+.seg button[aria-pressed="true"] { background: var(--ink); color: var(--paper); }
+select, input[type="number"], input[type="search"] { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: .35rem .5rem; }
+input[type="number"] { width: 5.5rem; }
+input[type="search"] { width: 15rem; max-width: 100%; }
+.checks { display: flex; gap: .9rem; align-items: center; padding: .35rem 0; white-space: nowrap; }
+.checks label { display: inline-flex; gap: .3rem; align-items: center; }
+.fold { align-self: end; }
+
+.domains { display: flex; gap: 1.6rem; padding: 1rem 0 0; }
+.domains button { font: 600 1.05rem var(--serif); color: var(--muted); background: none; border: 0; border-bottom: 2px solid transparent; padding: .2rem 0 .35rem; cursor: pointer; }
+.domains button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--ink); }
+
+.summary { margin: 1rem 0 .6rem; color: var(--muted); max-width: 90ch; }
+.summary b { color: var(--ink); font-weight: 600; }
+
+.tablewrap { background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; }
+table { width: 100%; border-collapse: collapse; }
+thead th { position: sticky; top: 0; z-index: 2; background: var(--panel); text-align: left; font-weight: 600; font-size: .85rem; padding: .55rem .6rem; border-bottom: 1px solid var(--rule); vertical-align: bottom; }
+thead th.num { text-align: right; }
+.key { display: block; font-weight: 400; color: var(--muted); font-size: .8rem; white-space: nowrap; }
+.dot { display: inline-block; width: .6em; height: .6em; border-radius: 50%; margin-right: .25em; vertical-align: .05em; }
+.dot.human { background: var(--human); } .dot.gpt { background: var(--gpt); } .dot.claude { background: var(--claude); }
+tbody tr.row { cursor: pointer; border-top: 1px solid var(--rule); }
+tbody tr.row:first-child { border-top: 0; }
+tbody tr.row:hover { background: var(--wash); }
+tbody tr.row[aria-expanded="true"] { background: var(--wash); }
+td { padding: .45rem .6rem; vertical-align: middle; }
+td.pat { font: .88rem/1.45 var(--mono); overflow-wrap: anywhere; min-width: 22ch; }
+td.trip { white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.trip span { display: inline-block; min-width: 3.4em; text-align: right; }
+td.trip .h, .t-human { color: var(--human-text); } td.trip .g, .t-gpt { color: var(--gpt-text); } td.trip .c, .t-claude { color: var(--claude-text); }
+td.ratio { white-space: nowrap; font-variant-numeric: tabular-nums; }
+td.ratio.on { background: color-mix(in srgb, var(--wash) 60%, transparent); }
+.axis { display: inline-block; position: relative; width: 108px; height: 10px; vertical-align: middle; margin-right: .5rem; }
+.axis::before { content: ""; position: absolute; left: 50%; top: -3px; bottom: -3px; width: 1px; background: var(--muted); opacity: .6; }
+.axis i { position: absolute; top: 1px; bottom: 1px; border-radius: 1px; }
+.axis i.pos { left: 50%; } .axis i.neg { right: 50%; }
+.axis i.gpt { background: var(--gpt); } .axis i.claude { background: var(--claude); }
+.lr { display: inline-block; min-width: 3.3em; text-align: right; font-weight: 600; }
+.z { display: inline-block; min-width: 5.2em; text-align: right; color: var(--muted); font-size: .88rem; }
+.variants { font: .78rem var(--sans); color: var(--muted); margin-left: .5rem; white-space: nowrap; }
+
+.br { color: var(--muted); }
+.l.tag { color: var(--muted); } .l.phrase { font-weight: 600; } .l.clause { font-weight: 700; color: var(--clause); }
+
+tr.detail > td { background: var(--wash); padding: 1rem 1.2rem 1.4rem; border-top: 1px solid var(--rule); }
+.detailgrid { display: grid; grid-template-columns: minmax(260px, auto) minmax(260px, 1fr); gap: 1.4rem 2.4rem; align-items: start; }
+.treebox { overflow-x: auto; }
+.treebox svg { display: block; }
+.legend { color: var(--muted); font-size: .82rem; margin: .4rem 0 0; }
+.node rect { fill: var(--panel); stroke: var(--ink); stroke-width: 1.2; }
+.node text { font: 600 12px var(--mono); fill: var(--ink); }
+.node.tag rect { stroke: var(--rule); stroke-width: 1; }
+.node.tag text { font-weight: 400; fill: var(--muted); }
+.node.clause rect { fill: var(--clause); stroke: var(--clause); }
+.node.clause text { fill: #fff; }
+.node.open rect { stroke-dasharray: 4 3; }
+.edge { stroke: var(--muted); stroke-width: 1; fill: none; opacity: .7; }
+.facts { width: auto; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-bottom: 1rem; }
+.facts th, .facts td { padding: .2rem 1rem .2rem 0; text-align: left; font-weight: 400; }
+.facts thead th { font-size: .82rem; color: var(--muted); border: 0; position: static; background: none; padding: 0 1rem .2rem 0; }
+.facts td { text-align: right; }
+.facts tbody th { white-space: nowrap; }
+.subhead { font: 600 .95rem var(--sans); margin: .2rem 0 .4rem; }
+.kidlist { list-style: none; padding: 0; margin: 0; display: grid; gap: .25rem; max-width: 680px; }
+.kidlist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 1rem; font-size: .85rem; }
+.kidlist .p { font: .82rem var(--mono); overflow-wrap: anywhere; }
+.kidlist .n { color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums; }
+.note { color: var(--muted); font-size: .85rem; margin: .8rem 0 0; }
+.tag-echo { font-size: .75rem; color: var(--muted); border: 1px solid var(--rule); border-radius: 3px; padding: 0 .3em; margin-left: .4em; }
+
+.empty { padding: 2.2rem 1rem; text-align: center; color: var(--muted); }
+button.more { font: inherit; color: var(--ink); background: var(--panel); border: 1px solid var(--rule); border-radius: 6px; padding: .5rem 1.1rem; margin: 1rem 0 0; cursor: pointer; }
+button.more:hover { background: var(--wash); }
+
+details.help { margin-top: 2.2rem; max-width: 80ch; }
+details.help summary { cursor: pointer; font: 600 1.05rem var(--serif); }
+details.help p, details.help li { color: var(--muted); }
+details.help dt { font-weight: 600; margin-top: .8rem; }
+details.help dd { margin: .1rem 0 0; color: var(--muted); }
+table.pool { width: auto; border-collapse: collapse; font-variant-numeric: tabular-nums; margin-top: .6rem; }
+table.pool th, table.pool td { padding: .2rem 1.2rem .2rem 0; text-align: right; font-weight: 400; }
+table.pool th:first-child, table.pool td:first-child { text-align: left; }
+table.pool thead th { color: var(--muted); font-size: .85rem; position: static; background: none; border: 0; }
+
+@media (max-width: 900px) {
+  .tablewrap { overflow-x: auto; }
+  table { min-width: 940px; }
+  thead th { position: static; }
+  .detailgrid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+<div class="page">
+  <header class="top">
+    <h1>Syntactic patterns in human and AI prose</h1>
+    <p class="lede" id="lede"></p>
+  </header>
+
+  <div class="domains" role="tablist" aria-label="Domain" id="domains"></div>
+
+  <section class="controls" aria-label="Filters">
+    <fieldset>
+      <legend>Compare with human</legend>
+      <div class="seg" id="focusSeg">
+        <button type="button" data-v="gpt" aria-pressed="false">GPT</button>
+        <button type="button" data-v="claude" aria-pressed="false">Claude</button>
+        <button type="button" data-v="both" aria-pressed="true">Both agree</button>
+      </div>
+    </fieldset>
+    <fieldset>
+      <legend>AI uses the pattern</legend>
+      <div class="seg" id="dirSeg">
+        <button type="button" data-v="over" aria-pressed="false">More</button>
+        <button type="button" data-v="under" aria-pressed="false">Less</button>
+        <button type="button" data-v="either" aria-pressed="true">Either</button>
+      </div>
+    </fieldset>
+    <label class="field"><span>Sort by</span>
+      <select id="sort">
+        <option value="evidence">Strength of evidence (z)</option>
+        <option value="effect">Size of difference (log2 ratio)</option>
+        <option value="human">Human rate</option>
+        <option value="ai">AI rate</option>
+      </select>
+    </label>
+    <label class="field"><span>Minimum documents</span>
+      <input type="number" id="minDocs" step="10">
+    </label>
+    <fieldset>
+      <legend>Depth</legend>
+      <div class="checks" id="depths">
+        <label><input type="checkbox" value="2" checked>2</label>
+        <label><input type="checkbox" value="3" checked>3</label>
+        <label><input type="checkbox" value="4" checked>4</label>
+      </div>
+    </fieldset>
+    <label class="field"><span>Search patterns</span>
+      <input type="search" id="query" autocomplete="off" spellcheck="false" placeholder="SBAR VP, or (VP (VBD)" title="Plain words match labels, so SBAR VP finds patterns containing both. Text with a bracket matches that fragment exactly.">
+    </label>
+    <div class="field fold">
+      <span>Echo variants</span>
+      <div class="checks">
+        <label><input type="checkbox" id="fold" checked>Fold if within</label>
+        <input type="number" id="delta" step="0.05" min="0" value="0.3" aria-label="Fold threshold in log2 units">
+        <span>log2 units</span>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <p class="summary" id="summary" aria-live="polite"></p>
+    <div class="tablewrap">
+      <table id="grid">
+        <thead>
+          <tr>
+            <th scope="col">Pattern</th>
+            <th scope="col" class="num">Rate per 1,000 tokens
+              <span class="key"><i class="dot human"></i>Human &nbsp;<i class="dot gpt"></i>GPT &nbsp;<i class="dot claude"></i>Claude</span></th>
+            <th scope="col" class="num">Documents
+              <span class="key"><i class="dot human"></i>H &nbsp;<i class="dot gpt"></i>G &nbsp;<i class="dot claude"></i>C</span></th>
+            <th scope="col"><i class="dot gpt"></i>GPT against human
+              <span class="key">log2 ratio, then z</span></th>
+            <th scope="col"><i class="dot claude"></i>Claude against human
+              <span class="key">log2 ratio, then z</span></th>
+          </tr>
+        </thead>
+        <tbody id="rows"></tbody>
+      </table>
+    </div>
+    <button type="button" class="more" id="more" hidden></button>
+    <noscript><p class="empty">This page needs JavaScript to show its table.</p></noscript>
+  </main>
+
+  <details class="help">
+    <summary>How to read this table</summary>
+    <dl>
+      <dt>Pattern</dt>
+      <dd>A fragment of a constituency parse. <code>(VP (VBD) (SBAR))</code> is a verb phrase made of a past-tense verb and a subordinate clause, as in <em>he said [that it rained]</em>. A label with nothing inside stands for any structure below it. Depth is the number of levels in the fragment.</dd>
+      <dt>Rate</dt>
+      <dd>How often the pattern occurs per 1,000 tokens (words and punctuation) of that source's text. Tokens rather than sentences, because sentence length differs between sources.</dd>
+      <dt>log2 ratio</dt>
+      <dd>The AI rate divided by the human rate, on a log2 scale: +1 means twice as often, &minus;1 half as often. The bar is clipped at &plusmn;3.</dd>
+      <dt>z</dt>
+      <dd>A ranking score for how well the data supports the difference: the log ratio divided by its approximate standard error. It treats occurrences as independent, so it overstates the evidence when a few documents account for most occurrences. Check the document counts, which show how widely a pattern is used. It is for ordering the table, not a significance test.</dd>
+      <dt>Both agree</dt>
+      <dd>Keeps patterns where GPT and Claude differ from human in the same direction, and ranks them by the weaker of the two scores.</dd>
+      <dt>Echo variants</dt>
+      <dd>A pattern's parent is the same pattern cut off one level higher. A variant whose log2 ratio is within the threshold of its parent's, and has the same sign, adds nothing new, so it is folded under the parent. Variants that differ from their parent stay in the list: they show where the parent's difference comes from. Open a row to see all of its variants.</dd>
+    </dl>
+    <p>The corpus is the Ghostbuster set. Counts are occurrences, so a pattern that occurs twice in a sentence counts twice. Only patterns used in at least <span id="floor"></span> documents of a domain are included.</p>
+    <table class="pool" id="pool"></table>
+  </details>
+</div>
+
+<script id="motif-data" type="application/json">__DATA__</script>
+<script>
+(() => {
+"use strict";
+
+const D = JSON.parse(document.getElementById("motif-data").textContent);
+const SOURCES = ["human", "gpt", "claude"];
+const SRC_LABEL = { human: "Human", gpt: "GPT", claude: "Claude" };
+const SRC_KEY = { human: "H", gpt: "G", claude: "C" };
+const PAGE = 100;
+const MINUS = "\u2212";
+
+const state = {
+  domain: D.order[0],
+  focus: "both",
+  dir: "either",
+  sort: "evidence",
+  minDocs: D.minDocs,
+  depths: new Set([2, 3, 4]),
+  query: "",
+  fold: true,
+  delta: 0.3,
+  shown: PAGE,
+  open: new Set(),
+};
+
+const $ = (sel) => document.querySelector(sel);
+const esc = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+const fmt = (x, d) => (x > 0 ? "+" : x < 0 ? MINUS : "") + Math.abs(x).toFixed(d);
+const num = (n) => n.toLocaleString("en-GB");
+
+const CLAUSE = new Set(["S", "SBAR", "SBARQ", "SINV", "SQ", "FRAG"]);
+const PHRASE = new Set(["NP", "VP", "PP", "ADJP", "ADVP", "QP", "WHNP", "WHPP", "WHADVP", "WHADJP",
+  "CONJP", "PRN", "UCP", "INTJ", "PRT", "LST", "NAC", "NX", "X", "RRC"]);
+const kindOf = (label) => (CLAUSE.has(label) ? "clause" : PHRASE.has(label) ? "phrase" : "tag");
+
+// ---------- data preparation (once per domain) ----------
+for (const name of D.order) {
+  const dom = D.domains[name];
+  const n = dom.p.length;
+  dom.n = n;
+  dom.kids = Array.from({ length: n }, () => []);
+  dom.par.forEach((p, i) => { if (p >= 0) dom.kids[p].push(i); });
+}
+
+// ---------- scoring ----------
+// key "z" scores evidence, "l" scores the size of the difference. For "both" the
+// two AIs must agree in direction, and the weaker of the two is used.
+function scoreOf(dom, i, focus, key) {
+  const g = dom[key + "G"][i];
+  const c = dom[key + "C"][i];
+  if (focus === "gpt") return g;
+  if (focus === "claude") return c;
+  const zg = dom.zG[i], zc = dom.zC[i];
+  if (!(zg * zc > 0)) return null;
+  return Math.sign(g) * Math.min(Math.abs(g), Math.abs(c));
+}
+
+function isEcho(dom, i, focus, delta) {
+  const p = dom.par[i];
+  if (p < 0) return false;
+  const close = (k) => {
+    const a = dom[k][i], b = dom[k][p];
+    return Math.sign(a) === Math.sign(b) && Math.abs(a - b) < delta;
+  };
+  if (focus === "gpt") return close("lG");
+  if (focus === "claude") return close("lC");
+  return close("lG") && close("lC");
+}
+
+function matcher(query) {
+  const q = query.trim();
+  if (!q) return null;
+  if (q.includes("(")) {
+    const lit = q.toLowerCase();
+    return (p) => p.toLowerCase().includes(lit);
+  }
+  const res = q.split(/\s+/).map((t) => new RegExp("\\(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "[ )]", "i"));
+  return (p) => res.every((re) => re.test(p));
+}
+
+function compute() {
+  const dom = D.domains[state.domain];
+  const f = state.focus, dir = state.dir;
+  const match = matcher(state.query);
+  const idx = [];
+  for (let i = 0; i < dom.n; i++) {
+    if (dom.dH[i] + dom.dG[i] + dom.dC[i] < state.minDocs) continue;
+    if (!state.depths.has(dom.d[i])) continue;
+    const z = scoreOf(dom, i, f, "z");
+    if (z === null) continue;
+    if (dir === "over" && !(z > 0)) continue;
+    if (dir === "under" && !(z < 0)) continue;
+    if (match && !match(dom.p[i])) continue;
+    idx.push(i);
+  }
+
+  const key = (i) => {
+    if (state.sort === "human") return dom.rH[i];
+    if (state.sort === "ai") return f === "gpt" ? dom.rG[i] : f === "claude" ? dom.rC[i] : (dom.rG[i] + dom.rC[i]) / 2;
+    const s = scoreOf(dom, i, f, state.sort === "evidence" ? "z" : "l");
+    return dir === "either" ? Math.abs(s) : dir === "under" ? -s : s;
+  };
+  const keys = new Map(idx.map((i) => [i, key(i)]));
+  idx.sort((a, b) => keys.get(b) - keys.get(a) || a - b);
+
+  let rows = idx, folded = 0;
+  const variants = new Map();
+  if (state.fold) {
+    const inSet = new Uint8Array(dom.n);
+    idx.forEach((i) => { inSet[i] = 1; });
+    const memo = new Int32Array(dom.n).fill(-2);
+    const leader = (i) => {
+      if (memo[i] !== -2) return memo[i];
+      const r = isEcho(dom, i, f, state.delta) ? leader(dom.par[i]) : i;
+      memo[i] = r;
+      return r;
+    };
+    rows = [];
+    for (const i of idx) {
+      const L = leader(i);
+      if (L !== i && inSet[L]) {
+        folded++;
+        variants.set(L, (variants.get(L) || 0) + 1);
+      } else {
+        rows.push(i);
+      }
+    }
+  }
+  return { dom, idx, rows, folded, variants };
+}
+
+// ---------- rendering ----------
+function patternHTML(p) {
+  return esc(p).replace(/\(([^\s()]+)|\)/g, (m, label) =>
+    label === undefined
+      ? '<span class="br">)</span>'
+      : '<span class="br">(</span><span class="l ' + kindOf(label) + '">' + label + "</span>");
+}
+
+function parsePattern(s) {
+  let i = 0;
+  const node = () => {
+    i++; // "("
+    let j = i;
+    while (s[j] !== " " && s[j] !== ")") j++;
+    const label = s.slice(i, j);
+    i = j;
+    const kids = [];
+    while (s[i] === " ") { i++; kids.push(node()); }
+    i++; // ")"
+    return { label, kids };
+  };
+  return node();
+}
+
+function treeSVG(p) {
+  const root = parsePattern(p);
+  const SP = 84, LV = 56, H = 26, PAD = 14, HALF = 45;
+  let leaves = 0, maxDepth = 0;
+  const lay = (n, d) => {
+    n.d = d;
+    maxDepth = Math.max(maxDepth, d);
+    if (!n.kids.length) { n.x = leaves++; }
+    else { n.kids.forEach((k) => lay(k, d + 1)); n.x = (n.kids[0].x + n.kids[n.kids.length - 1].x) / 2; }
+  };
+  lay(root, 0);
+  const px = (n) => PAD + HALF + n.x * SP;
+  const py = (n) => PAD + H / 2 + n.d * LV;
+  const W = (Math.max(leaves, 1) - 1) * SP + 2 * PAD + 2 * HALF;
+  const Ht = maxDepth * LV + H + 2 * PAD;
+  let edges = "", nodes = "";
+  const walk = (n) => {
+    for (const k of n.kids) {
+      edges += `<path class="edge" d="M${px(n)} ${py(n) + H / 2}L${px(k)} ${py(k) - H / 2}"/>`;
+      walk(k);
+    }
+    const kind = kindOf(n.label);
+    const w = Math.max(36, 9 * n.label.length + 16);
+    const open = !n.kids.length && kind !== "tag" ? " open" : "";
+    nodes += `<g class="node ${kind}${open}" transform="translate(${px(n)} ${py(n)})"><rect x="${-w / 2}" y="${-H / 2}" width="${w}" height="${H}" rx="5"/><text text-anchor="middle" dy="0.35em">${esc(n.label)}</text></g>`;
+  };
+  walk(root);
+  return `<svg width="${W}" height="${Ht}" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Tree of ${esc(p)}">${edges}${nodes}</svg>`;
+}
+
+function ratioCell(lr, z, src, on) {
+  const w = Math.min(Math.abs(lr) / 3, 1) * 50;
+  return `<td class="ratio${on ? " on" : ""}"><span class="axis"><i class="${lr >= 0 ? "pos" : "neg"} ${src}" style="width:${w}%"></i></span><span class="lr">${fmt(lr, 2)}</span><span class="z">z ${fmt(z, 1)}</span></td>`;
+}
+
+function rowHTML(dom, i, variants) {
+  const on = (s) => state.focus === "both" || state.focus === s;
+  const open = state.open.has(i);
+  const v = variants.get(i);
+  const badge = v ? `<span class="variants">${v} echo variant${v > 1 ? "s" : ""} folded</span>` : "";
+  let html = `<tr class="row" data-i="${i}" tabindex="0" role="button" aria-expanded="${open}">` +
+    `<td class="pat">${patternHTML(dom.p[i])}${badge}</td>` +
+    `<td class="trip"><span class="h">${dom.rH[i].toFixed(2)}</span><span class="g">${dom.rG[i].toFixed(2)}</span><span class="c">${dom.rC[i].toFixed(2)}</span></td>` +
+    `<td class="trip"><span class="h">${num(dom.dH[i])}</span><span class="g">${num(dom.dG[i])}</span><span class="c">${num(dom.dC[i])}</span></td>` +
+    ratioCell(dom.lG[i], dom.zG[i], "gpt", on("gpt")) +
+    ratioCell(dom.lC[i], dom.zC[i], "claude", on("claude")) +
+    "</tr>";
+  if (open) html += `<tr class="detail"><td colspan="5">${detailHTML(dom, i)}</td></tr>`;
+  return html;
+}
+
+function detailHTML(dom, i) {
+  const pool = D.pool[state.domain];
+  const facts = SOURCES.map((s) => {
+    const k = SRC_KEY[s];
+    const d = dom["d" + k][i];
+    return `<tr><th scope="row"><i class="dot ${s}"></i>${SRC_LABEL[s]}</th><td>${num(dom["c" + k][i])}</td>` +
+      `<td>${num(d)} of ${num(pool[s].n_docs)} (${Math.round((100 * d) / pool[s].n_docs)}%)</td><td>${dom["r" + k][i].toFixed(2)}</td></tr>`;
+  }).join("");
+
+  const rel = (j) => `${fmt(dom.lG[j], 2)} GPT, ${fmt(dom.lC[j], 2)} Claude`;
+  let family = "";
+  const par = dom.par[i];
+  if (par >= 0) {
+    family += `<p class="subhead">Refines</p><ul class="kidlist"><li><span class="p">${patternHTML(dom.p[par])}</span><span class="n">${rel(par)}</span></li></ul>`;
+  }
+  const kids = dom.kids[i].slice().sort((a, b) =>
+    Math.max(Math.abs(dom.zG[b]), Math.abs(dom.zC[b])) - Math.max(Math.abs(dom.zG[a]), Math.abs(dom.zC[a])));
+  if (kids.length) {
+    const shown = kids.slice(0, 15);
+    family += `<p class="subhead">Variants, one level deeper (${kids.length} in the table)</p><ul class="kidlist">` +
+      shown.map((j) => `<li><span class="p">${patternHTML(dom.p[j])}${isEcho(dom, j, state.focus, state.delta) ? '<span class="tag-echo">echo</span>' : ""}</span><span class="n">${rel(j)}</span></li>`).join("") +
+      "</ul>";
+    if (kids.length > shown.length) family += `<p class="note">${kids.length - shown.length} more not shown.</p>`;
+  }
+
+  return `<div class="detailgrid"><div><div class="treebox">${treeSVG(dom.p[i])}</div>` +
+    `<p class="legend">Dashed outline: any structure below that node is left out. Filled red nodes are clauses.</p></div>` +
+    `<div><table class="facts"><thead><tr><th></th><th>Occurrences</th><th>Documents using it</th><th>Rate per 1,000 tokens</th></tr></thead><tbody>${facts}</tbody></table>${family}` +
+    `<p class="note">Examples are not part of this version of the explorer.</p></div></div>`;
+}
+
+function render() {
+  const { dom, idx, rows, folded, variants } = compute();
+  const shown = rows.slice(0, state.shown);
+  $("#rows").innerHTML = shown.length
+    ? shown.map((i) => rowHTML(dom, i, variants)).join("")
+    : '<tr><td colspan="5" class="empty">No patterns match. Lower the minimum documents, widen the depth, or clear the search.</td></tr>';
+
+  const foldedText = state.fold && folded ? `, with ${num(folded)} echo variants folded under their parents` : "";
+  $("#summary").innerHTML = `<b>${num(rows.length)}</b> of ${num(idx.length)} matching patterns listed${foldedText}. ` +
+    `${num(dom.n)} patterns in ${esc(D.titles[state.domain])}.`;
+
+  const more = $("#more");
+  more.hidden = rows.length <= shown.length;
+  more.textContent = `Show ${Math.min(PAGE, rows.length - shown.length)} more`;
+}
+
+function renderStatic() {
+  $("#lede").innerHTML = `Phrase-structure patterns from ${num(D.totals.docs)} documents of human, GPT and Claude writing, compared with human writing. Each row is a fragment of a parse tree, for example <code>(VP (VBD) (SBAR))</code>, and open rows show its structure.`;
+  $("#floor").textContent = D.minDocs;
+  $("#minDocs").min = D.minDocs;
+  $("#minDocs").value = state.minDocs;
+
+  $("#domains").innerHTML = D.order.map((d) =>
+    `<button type="button" role="tab" data-d="${d}" aria-selected="${d === state.domain}">${esc(D.titles[d])}</button>`).join("");
+
+  let pool = "<thead><tr><th></th><th>Documents</th><th>Sentences</th><th>Tokens</th></tr></thead><tbody>";
+  for (const d of D.order) {
+    for (const s of SOURCES) {
+      const p = D.pool[d][s];
+      pool += `<tr><td>${esc(D.titles[d])}, ${SRC_LABEL[s]}</td><td>${num(p.n_docs)}</td><td>${num(p.n_sents)}</td><td>${num(p.n_tokens)}</td></tr>`;
+    }
+  }
+  $("#pool").innerHTML = pool + "</tbody>";
+}
+
+// ---------- events ----------
+function press(seg, value) {
+  seg.querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.v === value)));
+}
+function refresh() { state.shown = PAGE; render(); }
+
+$("#domains").addEventListener("click", (e) => {
+  const b = e.target.closest("button[data-d]");
+  if (!b) return;
+  state.domain = b.dataset.d;
+  state.open = new Set();
+  $("#domains").querySelectorAll("button").forEach((x) => x.setAttribute("aria-selected", String(x === b)));
+  refresh();
+});
+$("#focusSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  state.focus = b.dataset.v;
+  press($("#focusSeg"), state.focus);
+  refresh();
+});
+$("#dirSeg").addEventListener("click", (e) => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  state.dir = b.dataset.v;
+  press($("#dirSeg"), state.dir);
+  refresh();
+});
+$("#sort").addEventListener("change", (e) => { state.sort = e.target.value; refresh(); });
+$("#minDocs").addEventListener("input", (e) => {
+  const v = parseInt(e.target.value, 10);
+  state.minDocs = Number.isFinite(v) ? Math.max(v, D.minDocs) : D.minDocs;
+  refresh();
+});
+$("#depths").addEventListener("change", () => {
+  state.depths = new Set([...document.querySelectorAll("#depths input:checked")].map((c) => parseInt(c.value, 10)));
+  refresh();
+});
+$("#query").addEventListener("input", (e) => { state.query = e.target.value; refresh(); });
+$("#fold").addEventListener("change", (e) => { state.fold = e.target.checked; refresh(); });
+$("#delta").addEventListener("input", (e) => {
+  const v = parseFloat(e.target.value);
+  state.delta = Number.isFinite(v) && v >= 0 ? v : 0.3;
+  refresh();
+});
+$("#more").addEventListener("click", () => { state.shown += PAGE; render(); });
+
+function toggle(tr) {
+  const i = parseInt(tr.dataset.i, 10);
+  if (state.open.has(i)) state.open.delete(i); else state.open.add(i);
+  render();
+  const again = document.querySelector(`tr.row[data-i="${i}"]`);
+  if (again) again.focus({ preventScroll: true });
+}
+$("#rows").addEventListener("click", (e) => {
+  const tr = e.target.closest("tr.row");
+  if (tr) toggle(tr);
+});
+$("#rows").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter" && e.key !== " ") return;
+  const tr = e.target.closest("tr.row");
+  if (!tr) return;
+  e.preventDefault();
+  toggle(tr);
+});
+
+renderStatic();
+render();
+})();
+</script>
+</body>
+</html>

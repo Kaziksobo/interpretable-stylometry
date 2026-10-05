@@ -481,3 +481,25 @@ def remove_empty_nodes(tree: Tree) -> Tree | None:
     ):
         return children[0]
     return Tree(tree.label(), children)
+
+
+def parent_pattern(pattern: str) -> str | None:
+    """
+    Return a pattern's parent: the same pattern cut off one level higher.
+
+    Cutting the deepest level off a pattern turns the nodes one level up into
+    leaves, e.g. "(VP (VBD) (SBAR (S)))" has the parent "(VP (VBD) (SBAR))".
+    Every pattern deeper than 2 has exactly one parent, so patterns form a
+    forest, and a parent's occurrences include all of its children's.
+
+    Args:
+        pattern: Canonical pattern string
+
+    Returns:
+        The parent's canonical string, or None for a depth-2 pattern
+    """
+    depth = pattern_depth(pattern)
+    if depth <= 2:
+        return None
+    truncated = _extract_subtree_at_depth(Tree.fromstring(pattern), depth - 1)
+    return canonicalize(truncated)
