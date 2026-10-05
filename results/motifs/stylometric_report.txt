@@ -5,9 +5,9 @@
 --------------------------------------------------------------------------------
 
 Pattern: (VP (VBD) (NP) (NP) (S))
-  -> GPT PMI:    -4.679
-  -> Claude PMI: +2.207
-  -> Gap Size:   6.886
+  -> GPT PMI:    -4.666
+  -> Claude PMI: +2.219
+  -> Gap Size:   6.885
      ex1 [human]
        words:    introduced | two | Thursday | to
        sentence: Legislators introduced two bills Thursday to overturn the Clinton administration's export limits on computer encryption technology, a key component of online commerce and global communications.
@@ -15,10 +15,21 @@ Pattern: (VP (VBD) (NP) (NP) (S))
        words:    announced | plans | this | to
        sentence: The warning comes after Japan announced plans this week to build new docks and an environmental monitoring station on the largest island, Uotsuri Jima.
 
+Pattern: (VP (VBD) (NP (CD) (NN)))
+  -> GPT PMI:    -3.988
+  -> Claude PMI: +2.725
+  -> Gap Size:   6.713
+     ex1 [gpt]
+       words:    lost | 1.4 | %
+       sentence: Meanwhile, Constellation Software lost 1.4%, and Kinaxis gave up 1.8%, while Real Matters and CGI Group bucked the trend, surging 2.9% and 1.6%, respectively.
+     ex1 [claude]
+       words:    rose | 2.2 | %
+       sentence: The Hungarian BUX index gained over 3% on Monday, while Poland’s WIG20 rose 2.2% and the Czech PX index added 1.3%.
+
 Pattern: (S (VP (VBN) (PP)) (:))
-  -> GPT PMI:    -0.094
-  -> Claude PMI: +6.763
-  -> Gap Size:   6.856
+  -> GPT PMI:    -0.081
+  -> Claude PMI: +6.511
+  -> Gap Size:   6.592
      ex1 [claude]
        words:    Continued | on | ...
        sentence: Continued on next page...
@@ -27,34 +38,23 @@ Pattern: (S (VP (VBN) (PP)) (:))
        sentence: Continued on next page...
 
 Pattern: (S (VP (VBN) (PP (IN) (NP))) (:))
-  -> GPT PMI:    -0.094
-  -> Claude PMI: +6.763
-  -> Gap Size:   6.856
+  -> GPT PMI:    -0.081
+  -> Claude PMI: +6.511
+  -> Gap Size:   6.592
      ex1 [claude]
        words:    Continued | on | next | ...
        sentence: Continued on next page...
      ex1 [claude]
        words:    Continued | on | next | ...
        sentence: Continued on next page...
-
-Pattern: (VP (VBD) (NP (CD) (NN)))
-  -> GPT PMI:    -4.001
-  -> Claude PMI: +2.714
-  -> Gap Size:   6.714
-     ex1 [gpt]
-       words:    lost | 1.4 | %
-       sentence: Meanwhile, Constellation Software lost 1.4%, and Kinaxis gave up 1.8%, while Real Matters and CGI Group bucked the trend, surging 2.9% and 1.6%, respectively.
-     ex1 [claude]
-       words:    rose | 2.2 | %
-       sentence: The Hungarian BUX index gained over 3% on Monday, while Poland’s WIG20 rose 2.2% and the Czech PX index added 1.3%.
 
 
 ### STRONGEST GPT SIGNATURES: FURTHEST FROM HUMANS (REUTER)
 --------------------------------------------------------------------------------
 
 Pattern: (S (NP (DT)) (VP (VBZ) (VP)) (.))
-  -> GPT PMI:    +7.726 (Max Deviation)
-  -> Claude PMI: +4.500
+  -> GPT PMI:    +7.739 (Max Deviation)
+  -> Claude PMI: +4.511
      ex1 [gpt]
        words:    This | has | made | .
        sentence: This has made it difficult for companies to comply with regulations while operating on a global scale.
@@ -63,8 +63,8 @@ Pattern: (S (NP (DT)) (VP (VBZ) (VP)) (.))
        sentence: This has created a situation where businesses have to comply with multiple tax codes and deal with different tax authorities.
 
 Pattern: (S (NP (DT) (NN)) (VP (VBZ) (ADVP) (VP)) (.))
-  -> GPT PMI:    +7.661 (Max Deviation)
-  -> Claude PMI: +4.933
+  -> GPT PMI:    +7.674 (Max Deviation)
+  -> Claude PMI: +4.944
      ex1 [gpt]
        words:    The | campaign | has | also | argued | .
        sentence: The campaign has also argued that the risks associated with the export of encryption software can be managed and mitigated through careful policy planning and collaboration with industry professionals.
@@ -73,8 +73,8 @@ Pattern: (S (NP (DT) (NN)) (VP (VBZ) (ADVP) (VP)) (.))
        sentence: The tournament has always been popular among players due to its indoor surface, which is suited to the fast game of serve-and-volley.
 
 Pattern: (S (NP (DT) (NN)) (VP (VBZ) (VP (VBN) (VP))) (.))
-  -> GPT PMI:    +7.521 (Max Deviation)
-  -> Claude PMI: +4.878
+  -> GPT PMI:    +7.519 (Max Deviation)
+  -> Claude PMI: +4.889
      ex1 [gpt]
        words:    The | case | has | been | brought | .
        sentence: The case has been brought before the court by a group of banking institutions who are challenging the decision made by the Commodity Futures Trading Commission (CFTC) to impose new regulations on these types of trades.
@@ -83,8 +83,8 @@ Pattern: (S (NP (DT) (NN)) (VP (VBZ) (VP (VBN) (VP))) (.))
        sentence: The bank has been investing heavily in technology, as it seeks to improve its digital services and remain competitive in the fast-changing financial services landscape.
 
 Pattern: (SBAR (S (S) (CC) (S)))
-  -> GPT PMI:    -7.323 (Max Deviation)
-  -> Claude PMI: -1.964
+  -> GPT PMI:    -7.310 (Max Deviation)
+  -> Claude PMI: -1.952
      ex1 [human]
        words:    Asia | and | Singapore
        sentence: Macpherson said Asia was "an exciting part of the world" for investment capital and Singapore had been chosen as it was a good communication centre from which other parts of the region could be covered.
@@ -97,8 +97,8 @@ Pattern: (SBAR (S (S) (CC) (S)))
 --------------------------------------------------------------------------------
 
 Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S)))
-  -> Claude PMI: +7.444 (Max Deviation)
-  -> GPT PMI:    +2.906
+  -> Claude PMI: +7.456 (Max Deviation)
+  -> GPT PMI:    +2.919
      ex1 [claude]
        words:    announced | today | that | it
        sentence: ...ware Alliance, an industry trade group representing many of the world’s largest software companies, *announced today that it* is withdrawing its support for the Clinton administration’s policy on expo...
@@ -107,8 +107,8 @@ Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S)))
        sentence: The historic Lloyd's of London insurance market *announced today that over* 90% of its members have agreed to contribute £4.4 billion ($5.6 billion) to settle legal disputes dating back decades.
 
 Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S (NP) (VP))))
-  -> Claude PMI: +7.426 (Max Deviation)
-  -> GPT PMI:    +2.906
+  -> Claude PMI: +7.437 (Max Deviation)
+  -> GPT PMI:    +2.919
      ex1 [claude]
        words:    announced | today | that | it | is
        sentence: ...ware Alliance, an industry trade group representing many of the world’s largest software companies, *announced today that it is* withdrawing its support for the Clinton administration’s policy on expo...
@@ -117,8 +117,8 @@ Pattern: (VP (VBD) (NP (NN)) (SBAR (IN) (S (NP) (VP))))
        sentence: The Clinton administration *announced today that it will* revise controversial export rules for sophisticated encryption software and other computer encoding technologies.
 
 Pattern: (S (ADVP (RB)) (,) (NP (NNS)) (VP (VBP) (SBAR)) (.))
-  -> Claude PMI: +6.850 (Max Deviation)
-  -> GPT PMI:    +6.154
+  -> Claude PMI: +6.861 (Max Deviation)
+  -> GPT PMI:    +6.167
      ex1 [claude]
        words:    However | , | others | counter | that | .
        sentence: However, others counter that the innovations in the new strategic plan are critical for the USPS to keep up with the rapid pace of change in e-commerce and ensure the ongoing viability of its operations.
@@ -126,15 +126,15 @@ Pattern: (S (ADVP (RB)) (,) (NP (NNS)) (VP (VBP) (SBAR)) (.))
        words:    However | , | others | warn | that | .
        sentence: However, others warn that continuing to rely on IPv4 risks fragmenting parts of the Internet as some new devices and networks are cut off from full Internet access without sufficient IPv4 addresses.
 
-Pattern: (S (VP (VBN) (PP)) (:))
-  -> Claude PMI: +6.763 (Max Deviation)
-  -> GPT PMI:    -0.094
+Pattern: (S (VP (VP) (,) (VP) (,) (CC) (VP)))
+  -> Claude PMI: +6.681 (Max Deviation)
+  -> GPT PMI:    +6.504
      ex1 [claude]
-       words:    Continued | on | ...
-       sentence: Continued on next page...
+       words:    breaking | , | taxing | , | or | implementing
+       sentence: Notably absent from the recommendations are policies touted by liberal activists and some of Clinton's primary opponents like breaking up major tech companies, taxing robots, or implementing a universal basic income. The memo's authors contend such policies could negatively impact growth in a fast-changing sector.
      ex2 [claude]
-       words:    Continued | on | ...
-       sentence: Continued on page 2...
+       words:    accessing | , | doing | , | and | learning
+       sentence: “The Internet has become crucial for accessing new knowledge, doing research, and learning technical skills that are vital across many occupations and careers.
 
 
 ### CATEGORICAL PATTERNS: ONE MODEL NEVER PRODUCES (REUTER)
@@ -143,8 +143,8 @@ Pattern: (S (VP (VBN) (PP)) (:))
 Pattern: (VP (VBD) (NP) (NP) (S))
   -> GPT produces this 0 times
   -> Claude produces this 49 times
-  -> GPT PMI:    -4.679
-  -> Claude PMI: +2.207
+  -> GPT PMI:    -4.666
+  -> Claude PMI: +2.219
      ex1 [claude]
        words:    announced | plans | this | to
        sentence: The warning comes after Japan announced plans this week to build new docks and an environmental monitoring station on the largest island, Uotsuri Jima.
@@ -158,9 +158,9 @@ News Corp, which owns The Wall Street Journal, the New York Post, HarperCollins,
 
 Pattern: (S (VP (VBN) (PP)) (:))
   -> GPT produces this 0 times
-  -> Claude produces this 48 times
-  -> GPT PMI:    -0.094
-  -> Claude PMI: +6.763
+  -> Claude produces this 40 times
+  -> GPT PMI:    -0.081
+  -> Claude PMI: +6.511
      ex1 [claude]
        words:    Continued | on | ...
        sentence: Continued on next page...
@@ -170,9 +170,9 @@ Pattern: (S (VP (VBN) (PP)) (:))
 
 Pattern: (S (VP (VBN) (PP (IN) (NP))) (:))
   -> GPT produces this 0 times
-  -> Claude produces this 48 times
-  -> GPT PMI:    -0.094
-  -> Claude PMI: +6.763
+  -> Claude produces this 40 times
+  -> GPT PMI:    -0.081
+  -> Claude PMI: +6.511
      ex1 [claude]
        words:    Continued | on | next | ...
        sentence: Continued on next page...
@@ -183,8 +183,8 @@ Pattern: (S (VP (VBN) (PP (IN) (NP))) (:))
 Pattern: (NP (NP (NNP)) (,) (NP (CD)) (,))
   -> GPT produces this 0 times
   -> Claude produces this 40 times
-  -> GPT PMI:    -4.553
-  -> Claude PMI: +2.040
+  -> GPT PMI:    -4.541
+  -> Claude PMI: +2.051
      ex1 [claude]
        words:    Becker | , | 42 | ,
        sentence: Becker, 42, has been struggling with wrist issues over the past few months and had to pull out of events in Memphis and Delray Beach earlier this year citing the same injury.
@@ -195,8 +195,8 @@ Pattern: (NP (NP (NNP)) (,) (NP (CD)) (,))
 Pattern: (S (NP (DT) (NNS)) (VP (VBP) (SBAR (S))) (.))
   -> GPT produces this 0 times
   -> Claude produces this 32 times
-  -> GPT PMI:    -0.094
-  -> Claude PMI: +6.178
+  -> GPT PMI:    -0.081
+  -> Claude PMI: +6.189
      ex1 [claude]
        words:    Some | analysts | say | targeting | .
        sentence: Some analysts say targeting Wang is aimed at intimidating other activists and stifling the democracy movement in China.
@@ -207,8 +207,8 @@ Pattern: (S (NP (DT) (NNS)) (VP (VBP) (SBAR (S))) (.))
 Pattern: (S (NP (DT)) (VP (VBZ) (VP (VBN) (PP))) (.))
   -> Claude produces this 0 times
   -> GPT produces this 42 times
-  -> GPT PMI:    +6.298
-  -> Claude PMI: +0.178
+  -> GPT PMI:    +6.311
+  -> Claude PMI: +0.189
      ex1 [gpt]
        words:    This | has | led | to | .
        sentence: This has led to an increased interest in pensions and the need for more transparent and flexible pension products.
@@ -216,16 +216,16 @@ Pattern: (S (NP (DT)) (VP (VBZ) (VP (VBN) (PP))) (.))
        words:    This | has | led | to | .
        sentence: This has led to criticism from organizations such as the National Audit Office, which has highlighted the cost to the taxpayer of delays in awarding contracts.
 
-[ Domain 'reuter' completed in 32.5s ]
+[ Domain 'reuter' completed in 43.8s ]
 
 
 ### TOP DIVERGENCE: WHERE GPT AND CLAUDE DISAGREE MOST (WP)
 --------------------------------------------------------------------------------
 
 Pattern: (S (NP (NNP)) (VP (VBD)) (.))
-  -> GPT PMI:    -6.381
-  -> Claude PMI: +1.075
-  -> Gap Size:   7.456
+  -> GPT PMI:    -6.407
+  -> Claude PMI: +1.051
+  -> Gap Size:   7.458
      ex1 [human]
        words:    Uriel | continued | .
        sentence: Uriel continued.
@@ -234,9 +234,9 @@ Pattern: (S (NP (NNP)) (VP (VBD)) (.))
        sentence: Jenny sighed.
 
 Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
-  -> GPT PMI:    +7.359
-  -> Claude PMI: +0.427
-  -> Gap Size:   6.932
+  -> GPT PMI:    +7.333
+  -> Claude PMI: +0.403
+  -> Gap Size:   6.930
      ex1 [gpt]
        words:    Determined | , | Ethan | resolved | to | .
        sentence: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
@@ -245,9 +245,9 @@ Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
        sentence: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
 
 Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) (.))
-  -> GPT PMI:    +7.198
-  -> Claude PMI: +0.427
-  -> Gap Size:   6.771
+  -> GPT PMI:    +7.172
+  -> Claude PMI: +0.403
+  -> Gap Size:   6.769
      ex1 [gpt]
        words:    Once | upon | , | in | the | , | there | lived | a | .
        sentence: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
@@ -256,9 +256,9 @@ Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) 
        sentence: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
 
 Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
-  -> GPT PMI:    +6.918
-  -> Claude PMI: +0.427
-  -> Gap Size:   6.491
+  -> GPT PMI:    +6.892
+  -> Claude PMI: +0.403
+  -> Gap Size:   6.489
      ex1 [gpt]
        words:    Instead | , | she | imparted | the | , | emphasizing | .
        sentence: Instead, she imparted the importance of honesty and integrity, emphasizing the impact of one's actions on others.
@@ -271,8 +271,8 @@ Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
 --------------------------------------------------------------------------------
 
 Pattern: (VP (VBD) (NP (NP (DT) (JJ) (NN)) (VP (VBN) (S))))
-  -> GPT PMI:    +7.526 (Max Deviation)
-  -> Claude PMI: +2.427
+  -> GPT PMI:    +7.500 (Max Deviation)
+  -> Claude PMI: +2.403
      ex1 [gpt]
        words:    lived | a | carefree | student | named | Jake
        sentence: Once upon a time in a small college town, there *lived a carefree student named Jake*.
@@ -281,8 +281,8 @@ Pattern: (VP (VBD) (NP (NP (DT) (JJ) (NN)) (VP (VBN) (S))))
        sentence: Once upon a time, in a small town nestled by the sea, there *lived a young man named Lucas*.
 
 Pattern: (VP (VBD) (VP (VBN) (NP) (,) (S)))
-  -> GPT PMI:    +7.492 (Max Deviation)
-  -> Claude PMI: +5.012
+  -> GPT PMI:    +7.466 (Max Deviation)
+  -> Claude PMI: +4.988
      ex1 [gpt]
        words:    had | defied | the | , | perhaps
        sentence: In a world where everything had been permissible until the age of eighteen, Amelia and Jack had defied the odds, perhaps fulfilling the dreams of children everywhere—a world where innocence, adventure, and boundless love knew no boundaries.
@@ -291,8 +291,8 @@ Pattern: (VP (VBD) (VP (VBN) (NP) (,) (S)))
        sentence: The note in my trembling hands had arrived this morning, cryptically commanding my presence at an undisclosed location by 23:00.
 
 Pattern: (SBAR (IN) (S (NP (NNS)) (VP (VBD) (PP))))
-  -> GPT PMI:    +7.359 (Max Deviation)
-  -> Claude PMI: +5.012
+  -> GPT PMI:    +7.333 (Max Deviation)
+  -> Claude PMI: +4.988
      ex1 [gpt]
        words:    as | people | scattered | in
        sentence: Panicked screams echoed through the streets *as people scattered in* every direction.
@@ -301,8 +301,8 @@ Pattern: (SBAR (IN) (S (NP (NNS)) (VP (VBD) (PP))))
        sentence: *As fortunes fluctuated on* the screen, cheers and gasps filled the night air.
 
 Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
-  -> GPT PMI:    +7.359 (Max Deviation)
-  -> Claude PMI: +0.427
+  -> GPT PMI:    +7.333 (Max Deviation)
+  -> Claude PMI: +0.403
      ex1 [gpt]
        words:    Determined | , | Ethan | resolved | to | .
        sentence: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
@@ -315,8 +315,8 @@ Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
 --------------------------------------------------------------------------------
 
 Pattern: (NP (NP (NNP) (POS)) (NN) (CC) (NN))
-  -> Claude PMI: +5.597 (Max Deviation)
-  -> GPT PMI:    +5.433
+  -> Claude PMI: +5.573 (Max Deviation)
+  -> GPT PMI:    +5.407
      ex1 [claude]
        words:    Mark | 's | enthusiasm | and | humor
        sentence: Maggie found *Mark's enthusiasm and humor* irresistible.
@@ -325,8 +325,8 @@ Pattern: (NP (NP (NNP) (POS)) (NN) (CC) (NN))
        sentence: The story's climax comes when Clara realizes the depth of *Gerald's deception and manipulation*.
 
 Pattern: (S (NP (DT) (JJ) (NN)) (VP (VBD) (PP) (,) (S)) (.))
-  -> Claude PMI: +5.577 (Max Deviation)
-  -> GPT PMI:    +3.985
+  -> Claude PMI: +5.553 (Max Deviation)
+  -> GPT PMI:    +3.959
      ex1 [claude]
        words:    The | old | warehouse | lurked | at | , | holding | .
        sentence: The old warehouse lurked at the end of the abandoned street, holding untold secrets behind its rusty metal door.
@@ -335,8 +335,8 @@ Pattern: (S (NP (DT) (JJ) (NN)) (VP (VBD) (PP) (,) (S)) (.))
        sentence: The old warehouse loomed over the pier, creaking in the cold wind sweeping in from the bay.
 
 Pattern: (S (NP (PRP$) (PRP$) (NN)) (VP (VBD) (SBAR (IN) (S))) (.))
-  -> Claude PMI: +5.514 (Max Deviation)
-  -> GPT PMI:    +2.526
+  -> Claude PMI: +5.490 (Max Deviation)
+  -> GPT PMI:    +2.500
      ex1 [claude]
        words:    My | mind | raced | as | I | .
        sentence: My mind raced as I tried to make sense of what was happening.
@@ -345,8 +345,8 @@ Pattern: (S (NP (PRP$) (PRP$) (NN)) (VP (VBD) (SBAR (IN) (S))) (.))
        sentence: My heart dropped as I realized what was happening.
 
 Pattern: (S (NP (DT) (NNS)) (VP (VBD) (PP) (,) (S)) (.))
-  -> Claude PMI: +5.334 (Max Deviation)
-  -> GPT PMI:    +6.433
+  -> Claude PMI: +5.310 (Max Deviation)
+  -> GPT PMI:    +6.407
      ex1 [claude]
        words:    The | invaders | stared | in | , | realizing | .
        sentence: The invaders stared in shock, realizing their advanced weapons were useless against the primordial power of the spear.
@@ -361,8 +361,8 @@ Pattern: (S (NP (DT) (NNS)) (VP (VBD) (PP) (,) (S)) (.))
 Pattern: (S (NP (NNP)) (VP (VBD)) (.))
   -> GPT produces this 0 times
   -> Claude produces this 94 times
-  -> GPT PMI:    -6.381
-  -> Claude PMI: +1.075
+  -> GPT PMI:    -6.407
+  -> Claude PMI: +1.051
      ex1 [claude]
        words:    Jenny | sighed | .
        sentence: Jenny sighed.
@@ -373,8 +373,8 @@ Pattern: (S (NP (NNP)) (VP (VBD)) (.))
 Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
   -> Claude produces this 0 times
   -> GPT produces this 57 times
-  -> GPT PMI:    +7.359
-  -> Claude PMI: +0.427
+  -> GPT PMI:    +7.333
+  -> Claude PMI: +0.403
      ex1 [gpt]
        words:    Determined | , | Ethan | resolved | to | .
        sentence: Determined to bring harmony and peace, Ethan resolved to mediate between the factions.
@@ -385,8 +385,8 @@ Pattern: (S (S (VP)) (,) (NP (NNP)) (VP (VBD) (S)) (.))
 Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) (.))
   -> Claude produces this 0 times
   -> GPT produces this 51 times
-  -> GPT PMI:    +7.198
-  -> Claude PMI: +0.427
+  -> GPT PMI:    +7.172
+  -> Claude PMI: +0.403
      ex1 [gpt]
        words:    Once | upon | , | in | the | , | there | lived | a | .
        sentence: Once upon a time, in the quaint village of Serenity Falls, there lived a brilliant and eccentric scientist named Dr. Alexander Barnes.
@@ -397,8 +397,8 @@ Pattern: (S (ADVP (ADVP) (PP)) (,) (PP (IN) (NP)) (,) (NP (EX)) (VP (VBD) (NP)) 
 Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
   -> Claude produces this 0 times
   -> GPT produces this 42 times
-  -> GPT PMI:    +6.918
-  -> Claude PMI: +0.427
+  -> GPT PMI:    +6.892
+  -> Claude PMI: +0.403
      ex1 [gpt]
        words:    Instead | , | she | imparted | the | , | emphasizing | .
        sentence: Instead, she imparted the importance of honesty and integrity, emphasizing the impact of one's actions on others.
@@ -409,8 +409,8 @@ Pattern: (S (ADVP (RB)) (,) (NP (PRP)) (VP (VBD) (NP) (,) (S)) (.))
 Pattern: (VP (VB) (CC) (VP (VB) (NP (NP) (PP))))
   -> Claude produces this 0 times
   -> GPT produces this 36 times
-  -> GPT PMI:    +6.696
-  -> Claude PMI: +0.427
+  -> GPT PMI:    +6.670
+  -> Claude PMI: +0.403
      ex1 [gpt]
        words:    help | but | feel | a | of
        sentence: Shocked, Sarah couldn't help but feel a pang of disappointment.
@@ -421,8 +421,8 @@ Pattern: (VP (VB) (CC) (VP (VB) (NP (NP) (PP))))
 Pattern: (NP (RB) (DT) (ADJP) (NNS))
   -> Claude produces this 0 times
   -> GPT produces this 34 times
-  -> GPT PMI:    +4.613
-  -> Claude PMI: -1.573
+  -> GPT PMI:    +4.587
+  -> Claude PMI: -1.597
      ex1 [gpt]
        words:    even | the | most | statements
        sentence: He made even the most mundane statements sound like groundbreaking news.
@@ -430,16 +430,16 @@ Pattern: (NP (RB) (DT) (ADJP) (NNS))
        words:    even | the | most | prophecies
        sentence: William realized that destiny was not set in stone, and the power of love and perseverance could rewrite even the most ominous prophecies.
 
-[ Domain 'wp' completed in 40.6s ]
+[ Domain 'wp' completed in 79.5s ]
 
 
 ### TOP DIVERGENCE: WHERE GPT AND CLAUDE DISAGREE MOST (ESSAY)
 --------------------------------------------------------------------------------
 
 Pattern: (S (CC) (NP) (VP) (.))
-  -> GPT PMI:    -4.681
-  -> Claude PMI: +3.055
-  -> Gap Size:   7.735
+  -> GPT PMI:    -4.674
+  -> Claude PMI: +3.054
+  -> Gap Size:   7.727
      ex1 [human]
        words:    And | other | is | .
        sentence: And other conversations about race is the author’s sincere monolog about injustice, which provides insight into its grounds, effects, and approaches to overpower it.
@@ -448,9 +448,9 @@ Pattern: (S (CC) (NP) (VP) (.))
        sentence: And encrypted e-commerce transactions keep payment information private.
 
 Pattern: (NP (LST) (NP) (:))
-  -> GPT PMI:    +6.756
-  -> Claude PMI: -0.530
-  -> Gap Size:   7.286
+  -> GPT PMI:    +6.763
+  -> Claude PMI: -0.531
+  -> Gap Size:   7.294
      ex1 [gpt]
        words:    a. | Physical | :
        sentence: a. Physical and Psychological Abuse:
@@ -459,9 +459,9 @@ Pattern: (NP (LST) (NP) (:))
        sentence: * Deviance:
 
 Pattern: (NP (LST) (NP))
-  -> GPT PMI:    +4.467
-  -> Claude PMI: -2.530
-  -> Gap Size:   6.997
+  -> GPT PMI:    +4.474
+  -> Claude PMI: -2.531
+  -> Gap Size:   7.005
      ex1 [gpt]
        words:    B. | Implicit
        sentence: *B. Implicit* Biases and Stereotypes:
@@ -472,9 +472,9 @@ Pattern: (NP (LST) (NP))
  5.
 
 Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
-  -> GPT PMI:    -4.333
-  -> Claude PMI: +2.654
-  -> Gap Size:   6.987
+  -> GPT PMI:    -4.326
+  -> Claude PMI: +2.653
+  -> Gap Size:   6.979
      ex1 [human]
        words:    cultural | , | social | and | economic
        sentence: However, at the same time, *cultural, social and economic* foundations were laid for further development as independent States.
@@ -487,8 +487,8 @@ Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
 --------------------------------------------------------------------------------
 
 Pattern: (NP (NP) (PRN))
-  -> GPT PMI:    -8.697 (Max Deviation)
-  -> Claude PMI: -5.106
+  -> GPT PMI:    -8.688 (Max Deviation)
+  -> Claude PMI: -5.105
      ex1 [gpt]
        words:    the | -LRB-
        sentence: Studies have consistently found that the cost-effectiveness of preventive interventions is often underestimated, leading to the underutilization of these preventive approaches (Maciosek et al., 2010).
@@ -497,8 +497,8 @@ Pattern: (NP (NP) (PRN))
        sentence: In a series of studies, APA found that individuals who were able to stay calm and composed during disasters reported higher levels of preparedness, better decision-making abilities, and increased likelihood of taking necessary safety precautions (APA, 2018).
 
 Pattern: (PRN (-LRB-) (NP (NP) (,) (NP)) (-RRB-))
-  -> GPT PMI:    -7.833 (Max Deviation)
-  -> Claude PMI: -5.320
+  -> GPT PMI:    -7.824 (Max Deviation)
+  -> Claude PMI: -5.319
      ex1 [gpt]
        words:    -LRB- | Maciosek | , | 2010 | -RRB-
        sentence: Studies have consistently found that the cost-effectiveness of preventive interventions is often underestimated, leading to the underutilization of these preventive approaches (Maciosek et al., 2010).
@@ -507,8 +507,8 @@ Pattern: (PRN (-LRB-) (NP (NP) (,) (NP)) (-RRB-))
        sentence: The integration of patient perspectives has been found to improve clinical outcomes, patient satisfaction, and overall healthcare quality (Epstein et al., 2010).
 
 Pattern: (NP (NP) (PP) (:))
-  -> GPT PMI:    +7.536 (Max Deviation)
-  -> Claude PMI: +1.470
+  -> GPT PMI:    +7.543 (Max Deviation)
+  -> Claude PMI: +1.469
      ex1 [gpt]
        words:    Potential | of | :
        sentence: Potential Benefits of Legalization:
@@ -517,8 +517,8 @@ Pattern: (NP (NP) (PP) (:))
        sentence: Importance of Care Coordination in Healthcare:
 
 Pattern: (S (PP (IN) (S)) (,) (NP (NN) (NNS)) (VP (MD) (VP)) (.))
-  -> GPT PMI:    +7.297 (Max Deviation)
-  -> Claude PMI: +3.055
+  -> GPT PMI:    +7.304 (Max Deviation)
+  -> Claude PMI: +3.054
      ex1 [gpt]
        words:    By | adhering | , | healthcare | facilities | can | ensure | .
        sentence: By adhering to these principles, healthcare facilities can ensure that they provide the best possible care to their patients while creating a supportive and fulfilling work environment for their employees.
@@ -531,22 +531,22 @@ Pattern: (S (PP (IN) (S)) (,) (NP (NN) (NNS)) (VP (MD) (VP)) (.))
 --------------------------------------------------------------------------------
 
 Pattern: (S (NP (NP)) (VP (VBZ) (ADJP) (S)) (.))
-  -> Claude PMI: -6.473 (Max Deviation)
-  -> GPT PMI:    -0.308
+  -> Claude PMI: -6.474 (Max Deviation)
+  -> GPT PMI:    -0.301
      ex1 [claude]
        words:    It | is | important | to | .
        sentence: It is important to avoid technical jargon and check that the key messages are understood.
 
 Pattern: (S (NP (NP (PRP))) (VP (VBZ) (ADJP (JJ)) (S (VP))) (.))
-  -> Claude PMI: -6.363 (Max Deviation)
-  -> GPT PMI:    -0.214
+  -> Claude PMI: -6.364 (Max Deviation)
+  -> GPT PMI:    -0.207
      ex1 [claude]
        words:    It | is | important | to | .
        sentence: It is important to avoid technical jargon and check that the key messages are understood.
 
 Pattern: (NP (DT) (NP) (CONJP) (NP))
-  -> Claude PMI: +6.114 (Max Deviation)
-  -> GPT PMI:    +0.127
+  -> Claude PMI: +6.113 (Max Deviation)
+  -> GPT PMI:    +0.134
      ex1 [claude]
        words:    both | local | as | imported
        sentence: Local merchants established commercial contacts with merchants in other regions and cities, which allowed for the circulation of both local goods as well as imported luxuries and spices.
@@ -556,7 +556,7 @@ Pattern: (NP (DT) (NP) (CONJP) (NP))
 
 Pattern: (S (ADVP (RB)) (,) (NP (NP (PRP))) (VP (VBZ) (ADJP (JJ)) (S (VP))) (.))
   -> Claude PMI: -5.990 (Max Deviation)
-  -> GPT PMI:    +0.755
+  -> GPT PMI:    +0.762
      ex1 [claude]
        words:    However | , | it | is | difficult | to | .
        sentence: However, it is difficult to determine what counts as a puzzle or paradigm shift.
@@ -568,8 +568,8 @@ Pattern: (S (ADVP (RB)) (,) (NP (NP (PRP))) (VP (VBZ) (ADJP (JJ)) (S (VP))) (.))
 Pattern: (S (CC) (NP) (VP) (.))
   -> GPT produces this 0 times
   -> Claude produces this 84 times
-  -> GPT PMI:    -4.681
-  -> Claude PMI: +3.055
+  -> GPT PMI:    -4.674
+  -> Claude PMI: +3.054
      ex1 [claude]
        words:    And | encrypted | keep | .
        sentence: And encrypted e-commerce transactions keep payment information private.
@@ -580,8 +580,8 @@ Pattern: (S (CC) (NP) (VP) (.))
 Pattern: (NP (LST) (NP) (:))
   -> Claude produces this 0 times
   -> GPT produces this 99 times
-  -> GPT PMI:    +6.756
-  -> Claude PMI: -0.530
+  -> GPT PMI:    +6.763
+  -> Claude PMI: -0.531
      ex1 [gpt]
        words:    a. | Physical | :
        sentence: a. Physical and Psychological Abuse:
@@ -592,8 +592,8 @@ Pattern: (NP (LST) (NP) (:))
 Pattern: (NP (LST) (NP))
   -> Claude produces this 0 times
   -> GPT produces this 81 times
-  -> GPT PMI:    +4.467
-  -> Claude PMI: -2.530
+  -> GPT PMI:    +4.474
+  -> Claude PMI: -2.531
      ex1 [gpt]
        words:    B. | Implicit
        sentence: *B. Implicit* Biases and Stereotypes:
@@ -605,8 +605,8 @@ Pattern: (NP (LST) (NP))
 Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
   -> GPT produces this 0 times
   -> Claude produces this 50 times
-  -> GPT PMI:    -4.333
-  -> Claude PMI: +2.654
+  -> GPT PMI:    -4.326
+  -> Claude PMI: +2.653
      ex1 [claude]
        words:    strong | , | determined | and | heroic
        sentence: The striking bronze figures, their victory immortalized in stone, appear *strong, determined and heroic*.
@@ -617,8 +617,8 @@ Pattern: (ADJP (JJ) (,) (JJ) (CC) (JJ))
 Pattern: (NP (NP) (,) (NP) (,) (NP) (CC) (NP))
   -> GPT produces this 0 times
   -> Claude produces this 41 times
-  -> GPT PMI:    -4.333
-  -> Claude PMI: +2.368
+  -> GPT PMI:    -4.326
+  -> Claude PMI: +2.367
      ex1 [claude]
        words:    immigrants | , | ethnic | , | disabled | or | those
        sentence: Lack of healthcare is especially problematic for marginalized groups like immigrants, ethnic minorities, disabled individuals or those living in rural/remote areas.
@@ -629,8 +629,8 @@ Pattern: (NP (NP) (,) (NP) (,) (NP) (CC) (NP))
 Pattern: (S (NP (EX)) (VP (VBD) (NP)) (.))
   -> GPT produces this 0 times
   -> Claude produces this 37 times
-  -> GPT PMI:    -4.195
-  -> Claude PMI: +2.357
+  -> GPT PMI:    -4.188
+  -> Claude PMI: +2.356
      ex1 [claude]
        words:    There | were | a | .
        sentence: There were a range of views on how imperialism related to liberalism.
@@ -638,4 +638,4 @@ Pattern: (S (NP (EX)) (VP (VBD) (NP)) (.))
        words:    There | were | several | .
        sentence: There were several reasons why large numbers of women were accused of witchcraft in sixteenth and seventeenth century England.
 
-[ Domain 'essay' completed in 41.0s ]
+[ Domain 'essay' completed in 79.5s ]
