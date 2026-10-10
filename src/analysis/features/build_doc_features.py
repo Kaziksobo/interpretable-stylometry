@@ -49,7 +49,7 @@ def main() -> None:
             "Run build_constituency_features.py first."
         )
 
-    # Shared cleaning rules (letterless sentences, orphaned Reuters rows)
+    # Shared cleaning rules (letterless sentences, orphaned Reuters rows, bare headings)
     df = drop_junk_sentences(df)
     print(f"  {len(df):,} sentences remain")
 

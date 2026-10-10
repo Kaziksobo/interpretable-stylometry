@@ -4,6 +4,8 @@ Every analysis filters the same way, so the document pool is identical
 across research questions. Not a driver script -- imported, no __main__.
 """
 
+import re
+
 import pandas as pd
 
 # stand-in for a missing author (essay, wp), so those rows can still be
@@ -13,6 +15,11 @@ NO_AUTHOR = "__none__"
 # doc_id alone is not unique in the Reuters domain, so documents are keyed by
 # all four columns
 DOC_KEY = ["domain", "source", "doc_id", "author"]
+
+# a sentence that is only a label ending in a colon: a capital first letter, up
+# to 40 characters of letters, digits, spaces, commas, apostrophes, ampersands
+# and hyphens, and no sentence punctuation ("Introduction:", "SAM:")
+HEADING_LABEL = re.compile(r"^[A-Z][A-Za-z0-9 ,'&-]{0,40}:$")
 
 
 def filter_min_sents(df: pd.DataFrame, min_sents: int = 5) -> pd.DataFrame:
@@ -39,10 +46,13 @@ def filter_min_sents(df: pd.DataFrame, min_sents: int = 5) -> pd.DataFrame:
 def drop_junk_sentences(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """Drops sentences that are not analysable prose.
 
-    Two rules: sentences with no letters (sentence-splitter artefacts such
+    Three rules: sentences with no letters (sentence-splitter artefacts such
     as a lone quote mark or "...", which every classifier labels OTHER),
-    and Reuters sentences with no author (orphaned pseudo-documents left
-    over from the author fix).
+    Reuters sentences with no author (orphaned pseudo-documents left over
+    from the author fix), and bare heading lines (a section label or speaker
+    label such as "Introduction:" or "SAM:", which the splitter turns into a
+    sentence of its own). GPT essays in particular contain section labels;
+    left in, they inflate that source's type-OTHER rate.
 
     Args:
         df (pd.DataFrame): Sentence-level DataFrame with "sent_text",
@@ -55,12 +65,14 @@ def drop_junk_sentences(df: pd.DataFrame, verbose: bool = True) -> pd.DataFrame:
     """
     has_letters = df["sent_text"].str.contains(r"[^\W\d_]", regex=True, na=False)
     reuter_orphan = (df["domain"] == "reuter") & df["author"].isna()
+    heading = df["sent_text"].str.strip().str.match(HEADING_LABEL, na=False)
 
     if verbose:
         print(f"  dropping {(~has_letters).sum():,} sentences with no letters")
         print(f"  dropping {reuter_orphan.sum():,} reuter sentences with no author")
+        print(f"  dropping {heading.sum():,} bare heading lines")
 
-    return df[has_letters & ~reuter_orphan].reset_index(drop=True)
+    return df[has_letters & ~reuter_orphan & ~heading].reset_index(drop=True)
 
 
 def restrict_to_docs(sentences: pd.DataFrame, docs: pd.DataFrame) -> pd.DataFrame:

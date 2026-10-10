@@ -1,49 +1,49 @@
 domain,comparison,scheme,category,rho_diff_main,p_value_fdr_main,verdict_main,rho_diff_excl,p_value_fdr_excl,verdict_excl,verdict_changed
-essay,human_vs_gpt,sentence_type,SIMPLE,0.0005633715901675745,0.9425035199622553,no difference,0.00044354451023308206,0.9605523195394602,no difference,False
-essay,human_vs_gpt,sentence_type,COMPLEX,0.004951588629367981,0.5544377399417266,no difference,0.004240966859322494,0.6248858082684587,no difference,False
-essay,human_vs_gpt,sentence_type,COMPOUND,-0.024283060294719414,0.000151415133536444,AI more variable,-0.024310521710289596,0.00012504894828562147,AI more variable,False
-essay,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,0.006885200856992301,0.3996664556297983,no difference,0.006879182552939785,0.41531903949409354,no difference,False
-essay,human_vs_gpt,sentence_type,OTHER,-0.06728135469792375,0.008207726753594168,AI more variable,-0.06937837923954658,0.005092464200673539,AI more variable,False
-essay,human_vs_gpt,sentence_structure,LOOSE,0.006676613282742168,0.3388095520873243,no difference,0.006266264628315608,0.3815055968905568,no difference,False
-essay,human_vs_gpt,sentence_structure,PERIODIC,-0.008045455360524638,0.3388095520873243,no difference,-0.008165386619588773,0.32773315055651164,no difference,False
-essay,human_vs_gpt,sentence_structure,OTHER,0.010319777170761081,0.194440467975498,no difference,0.00909910212607929,0.25939458573875884,no difference,False
-essay,human_vs_claude,sentence_type,SIMPLE,-0.003825423218163898,0.6156228444817538,no difference,-0.003938154137783534,0.6302697826331938,no difference,False
-essay,human_vs_claude,sentence_type,COMPLEX,0.004977819393844118,0.5544377399417266,no difference,0.00446380090856989,0.6248858082684587,no difference,False
-essay,human_vs_claude,sentence_type,COMPOUND,-0.004415646869214914,0.5544377399417266,no difference,-0.004474975281390632,0.619217384304472,no difference,False
-essay,human_vs_claude,sentence_type,COMPLEX-COMPOUND,5.463009116071088e-05,0.9926024800289793,no difference,-5.599474360414025e-06,0.9992587384364731,no difference,False
-essay,human_vs_claude,sentence_type,OTHER,0.03869312633734448,0.15113866073363788,no difference,0.052674794826195026,0.00029841635676881054,human more variable,True
-essay,human_vs_claude,sentence_structure,LOOSE,0.010784827439106547,0.10579603301312772,no difference,0.01043768100638201,0.10108377294932096,no difference,False
-essay,human_vs_claude,sentence_structure,PERIODIC,0.00647743740535503,0.4885245366617821,no difference,0.0062868606541472555,0.5122333249842311,no difference,False
-essay,human_vs_claude,sentence_structure,OTHER,0.01268145055146793,0.13016866507517427,no difference,0.011443939622385296,0.1689191730783549,no difference,False
-reuter,human_vs_gpt,sentence_type,SIMPLE,-0.007657365589905735,0.5544377399417266,no difference,-0.0074881758831391795,0.619217384304472,no difference,False
-reuter,human_vs_gpt,sentence_type,COMPLEX,-0.00204843595329942,0.7939573494951256,no difference,-0.002288630716588552,0.7668414085937292,no difference,False
-reuter,human_vs_gpt,sentence_type,COMPOUND,0.009923182316508485,0.258873916860459,no difference,0.010073402142114638,0.25939458573875884,no difference,False
-reuter,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,-0.010650993690104114,0.2243507347258592,no difference,-0.01083861148992368,0.23515148692077115,no difference,False
-reuter,human_vs_gpt,sentence_type,OTHER,0.03345668969312279,0.17983360346851077,no difference,0.013123082696847442,0.011379306379121107,human more variable,True
-reuter,human_vs_gpt,sentence_structure,LOOSE,0.0035077174570997613,0.6166302287382257,no difference,0.003183878642364822,0.6590917854028074,no difference,False
-reuter,human_vs_gpt,sentence_structure,PERIODIC,0.0037438402243367003,0.648731502540555,no difference,0.0035650963988592757,0.6667332188715683,no difference,False
-reuter,human_vs_gpt,sentence_structure,OTHER,0.011236133590830921,0.1859372093017425,no difference,0.009338708390694388,0.26494838506948726,no difference,False
-reuter,human_vs_claude,sentence_type,SIMPLE,0.0066509621518516596,0.5693801099481932,no difference,0.006820151858618215,0.619217384304472,no difference,False
-reuter,human_vs_claude,sentence_type,COMPLEX,0.004538213788990813,0.5887432697108735,no difference,0.0042980190257016805,0.6248858082684587,no difference,False
-reuter,human_vs_claude,sentence_type,COMPOUND,0.02530621188737911,0.0012441147037699951,human more variable,0.025456431712985263,0.001080846678963078,human more variable,False
-reuter,human_vs_claude,sentence_type,COMPLEX-COMPOUND,0.010344096622789097,0.194440467975498,no difference,0.010156478822969531,0.2321051583708425,no difference,False
-reuter,human_vs_claude,sentence_type,OTHER,0.028642002646615053,0.2424720968016665,no difference,0.008308395650339697,0.24250128995081413,no difference,False
-reuter,human_vs_claude,sentence_structure,LOOSE,0.00718307484471991,0.41065339905581755,no difference,0.0068592360299849706,0.44848937281786044,no difference,False
-reuter,human_vs_claude,sentence_structure,PERIODIC,0.026795144663401636,0.0005270248272074798,human more variable,0.02661640083792421,0.00047941408323282206,human more variable,False
-reuter,human_vs_claude,sentence_structure,OTHER,0.005406444791772252,0.5544377399417266,no difference,0.0035090195916357182,0.6624455949663468,no difference,False
-wp,human_vs_gpt,sentence_type,SIMPLE,0.03196694669713938,2.023029705398885e-09,human more variable,0.031964480580907145,2.213615070053765e-09,human more variable,False
-wp,human_vs_gpt,sentence_type,COMPLEX,0.020843250786791372,0.00017399354236945937,human more variable,0.020984927376901656,0.00019901898074888667,human more variable,False
-wp,human_vs_gpt,sentence_type,COMPOUND,-0.002721302160407441,0.619639491593559,no difference,-0.0028753928345915444,0.6302697826331938,no difference,False
-wp,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,0.04087748910499709,7.341104611147357e-07,human more variable,0.0408254091625712,1.3008486532344097e-06,human more variable,False
-wp,human_vs_gpt,sentence_type,OTHER,-0.013927334563335426,0.594958944475591,no difference,-0.013874137795851796,0.6248858082684587,no difference,False
-wp,human_vs_gpt,sentence_structure,LOOSE,0.0031283765043296392,0.5544377399417266,no difference,0.003020945504664958,0.619217384304472,no difference,False
-wp,human_vs_gpt,sentence_structure,PERIODIC,0.04117799689875398,4.269289014644079e-09,human more variable,0.04106328148229867,4.4036590760604805e-09,human more variable,False
-wp,human_vs_gpt,sentence_structure,OTHER,0.05522558836285119,1.279129367168405e-18,human more variable,0.05517242968750371,5.728717841508574e-19,human more variable,False
-wp,human_vs_claude,sentence_type,SIMPLE,0.0191216254032439,0.0005389017978155217,human more variable,0.019144425110283997,0.00047941408323282206,human more variable,False
-wp,human_vs_claude,sentence_type,COMPLEX,0.003922161755958754,0.5544377399417266,no difference,0.0037200778491041295,0.6248858082684587,no difference,False
-wp,human_vs_claude,sentence_type,COMPOUND,0.004099491281880502,0.48406383123253194,no difference,0.00396967695531459,0.5122333249842311,no difference,False
-wp,human_vs_claude,sentence_type,COMPLEX-COMPOUND,0.04093754493685512,2.874201700840945e-07,human more variable,0.040886029463663674,4.813922086213552e-07,human more variable,False
-wp,human_vs_claude,sentence_type,OTHER,0.016111809578256163,0.03636195727828539,human more variable,0.013379070290302754,0.10033442890774368,no difference,True
-wp,human_vs_claude,sentence_structure,LOOSE,-0.0068572212372871,0.18540847940722846,no difference,-0.007243209424773012,0.15340279539699134,no difference,False
-wp,human_vs_claude,sentence_structure,PERIODIC,0.040281239544258544,2.023029705398885e-09,human more variable,0.04012385186414595,2.65905044264919e-09,human more variable,False
-wp,human_vs_claude,sentence_structure,OTHER,0.032317183140647056,6.271546310378857e-07,human more variable,0.0313665796760789,1.3008486532344097e-06,human more variable,False
+essay,human_vs_gpt,sentence_type,SIMPLE,0.0017515296483711917,0.7798285047374726,no difference,0.0016318543676890201,0.8005721147200993,no difference,False
+essay,human_vs_gpt,sentence_type,COMPLEX,0.0064144445852536425,0.48567299755630855,no difference,0.005703585653355651,0.5462653622805934,no difference,False
+essay,human_vs_gpt,sentence_type,COMPOUND,-0.025946296047368752,5.149886214458087e-05,AI more variable,-0.025973770526232145,3.697231145839453e-05,AI more variable,False
+essay,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,0.005607379462019054,0.5103748630422511,no difference,0.005601353827307497,0.5410470839935374,no difference,False
+essay,human_vs_gpt,sentence_type,OTHER,-0.07501214923032654,0.013444343199098404,AI more variable,-0.07713859452414804,0.009066355914174564,AI more variable,False
+essay,human_vs_gpt,sentence_structure,LOOSE,0.008983211537388056,0.17476974574792586,no difference,0.00857258525488698,0.20217217154651757,no difference,False
+essay,human_vs_gpt,sentence_structure,PERIODIC,-0.010112095201402015,0.2054602665915563,no difference,-0.010232089968603475,0.20217217154651757,no difference,False
+essay,human_vs_gpt,sentence_structure,OTHER,0.010797914348564058,0.17476974574792586,no difference,0.009575597356761806,0.2080950130556353,no difference,False
+essay,human_vs_claude,sentence_type,SIMPLE,-0.003956086796465669,0.614920518184474,no difference,-0.00406839514233024,0.6225893765065803,no difference,False
+essay,human_vs_claude,sentence_type,COMPLEX,0.005023571840277581,0.555877360136556,no difference,0.004509860776660296,0.6064492893180922,no difference,False
+essay,human_vs_claude,sentence_type,COMPOUND,-0.004374124347273904,0.555877360136556,no difference,-0.004433438268675132,0.5764576594587694,no difference,False
+essay,human_vs_claude,sentence_type,COMPLEX-COMPOUND,8.803104823331895e-05,0.9880751335197935,no difference,2.7833751469655277e-05,0.9963138466574593,no difference,False
+essay,human_vs_claude,sentence_type,OTHER,0.04488152387262368,0.09850825971432292,no difference,0.060461735033482615,1.879261214924832e-05,human more variable,True
+essay,human_vs_claude,sentence_structure,LOOSE,0.010934945241486426,0.09719834661422268,no difference,0.010588148208138033,0.09862878747384396,no difference,False
+essay,human_vs_claude,sentence_structure,PERIODIC,0.006504428449733937,0.48567299755630855,no difference,0.006313760162074279,0.5276673230295207,no difference,False
+essay,human_vs_claude,sentence_structure,OTHER,0.012897854942943945,0.11068463811150611,no difference,0.011659809049443366,0.15433869917115975,no difference,False
+reuter,human_vs_gpt,sentence_type,SIMPLE,-0.0076292124487670615,0.555877360136556,no difference,-0.007460022742000506,0.5764576594587694,no difference,False
+reuter,human_vs_gpt,sentence_type,COMPLEX,-0.00208128667919813,0.7798285047374726,no difference,-0.0023214814424872623,0.7630186739530399,no difference,False
+reuter,human_vs_gpt,sentence_type,COMPOUND,0.009930372699243743,0.2391534673244834,no difference,0.010080592524849896,0.2388928303543208,no difference,False
+reuter,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,-0.01062977525136136,0.20762992029188956,no difference,-0.010817393051180926,0.20698587374239222,no difference,False
+reuter,human_vs_gpt,sentence_type,OTHER,0.03322268621141418,0.17476974574792586,no difference,0.012889079215138826,0.013746481453852483,human more variable,True
+reuter,human_vs_gpt,sentence_structure,LOOSE,0.0033945065030479143,0.631075231502816,no difference,0.003070667688312975,0.6633611807303814,no difference,False
+reuter,human_vs_gpt,sentence_structure,PERIODIC,0.00377577140469601,0.6454000131312199,no difference,0.0035970275792185855,0.6633611807303814,no difference,False
+reuter,human_vs_gpt,sentence_structure,OTHER,0.01113981072089296,0.17476974574792586,no difference,0.009242385520756426,0.25275639331642435,no difference,False
+reuter,human_vs_claude,sentence_type,SIMPLE,0.006692731003949251,0.5659086585691925,no difference,0.006861920710715806,0.582137948116919,no difference,False
+reuter,human_vs_claude,sentence_type,COMPLEX,0.00454502067977151,0.5879204119894362,no difference,0.004304825916482378,0.6225893765065803,no difference,False
+reuter,human_vs_claude,sentence_type,COMPOUND,0.02525683246772369,0.0012944839671870639,human more variable,0.025407052293329842,0.0011247478239250909,human more variable,False
+reuter,human_vs_claude,sentence_type,COMPLEX-COMPOUND,0.010349332019813218,0.18564007431954008,no difference,0.010161714219993652,0.20217217154651757,no difference,False
+reuter,human_vs_claude,sentence_type,OTHER,0.029027713835547957,0.21493740331297687,no difference,0.008694106839272603,0.20217217154651757,no difference,False
+reuter,human_vs_claude,sentence_structure,LOOSE,0.007195322923186077,0.42380043657525224,no difference,0.006871484108451138,0.4629020938185927,no difference,False
+reuter,human_vs_claude,sentence_structure,PERIODIC,0.02677217748633793,0.000530324968729602,human more variable,0.026593433660860505,0.0004855072340693918,human more variable,False
+reuter,human_vs_claude,sentence_structure,OTHER,0.005322132806955596,0.555877360136556,no difference,0.003424707606819063,0.6633611807303814,no difference,False
+wp,human_vs_gpt,sentence_type,SIMPLE,0.032113562476156564,2.033165604377071e-09,human more variable,0.03211077579204164,1.8560142155152152e-09,human more variable,False
+wp,human_vs_gpt,sentence_type,COMPLEX,0.021200497001326313,0.0001369066261378494,human more variable,0.021342214226124482,0.00014147129166392568,human more variable,False
+wp,human_vs_gpt,sentence_type,COMPOUND,-0.0028662229828793524,0.6259370000201339,no difference,-0.003020566879819414,0.6225893765065803,no difference,False
+wp,human_vs_gpt,sentence_type,COMPLEX-COMPOUND,0.04082084425898858,7.488295913533263e-07,human more variable,0.04076862490625356,1.3202804617348924e-06,human more variable,False
+wp,human_vs_gpt,sentence_type,OTHER,-0.011528085673414006,0.6382394440750377,no difference,-0.011436069629493173,0.6633611807303814,no difference,False
+wp,human_vs_gpt,sentence_structure,LOOSE,0.0032513351692284847,0.555877360136556,no difference,0.0031435211768342363,0.5764576594587694,no difference,False
+wp,human_vs_gpt,sentence_structure,PERIODIC,0.040837540569735015,6.041292114350345e-09,human more variable,0.040722224095043044,6.344012280792813e-09,human more variable,False
+wp,human_vs_gpt,sentence_structure,OTHER,0.05545237148670955,8.664082514381556e-19,human more variable,0.05539888784732167,3.974394261667079e-19,human more variable,False
+wp,human_vs_claude,sentence_type,SIMPLE,0.019149366778905108,0.000530324968729602,human more variable,0.019171776207039852,0.0004855072340693918,human more variable,False
+wp,human_vs_claude,sentence_type,COMPLEX,0.004267646581307856,0.555877360136556,no difference,0.004065511681794101,0.5764576594587694,no difference,False
+wp,human_vs_claude,sentence_type,COMPOUND,0.004079531696917139,0.48567299755630855,no difference,0.0039496410428575095,0.5332730857994287,no difference,False
+wp,human_vs_claude,sentence_type,COMPLEX-COMPOUND,0.04093669131625362,2.810650113923291e-07,human more variable,0.04088504983977856,4.707912056816766e-07,human more variable,False
+wp,human_vs_claude,sentence_type,OTHER,0.01588327603681987,0.04112273706542385,human more variable,0.01313190652055933,0.10343623600978546,no difference,True
+wp,human_vs_claude,sentence_structure,LOOSE,-0.0067606711928081265,0.17476974574792586,no difference,-0.007147164850757986,0.15433869917115975,no difference,False
+wp,human_vs_claude,sentence_structure,PERIODIC,0.04023115614984847,2.033165604377071e-09,human more variable,0.04007327409747931,2.7105356362270105e-09,human more variable,False
+wp,human_vs_claude,sentence_structure,OTHER,0.032497179806531294,5.185633377203785e-07,human more variable,0.031544542496969676,1.2750394353170655e-06,human more variable,False
