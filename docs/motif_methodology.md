@@ -23,26 +23,26 @@
 
 - Input: `data/processed/parses/constituency_parses.feather` — one row per sentence, parsed with spaCy + benepar (`src/parsing/constituency_parse.py`)
 - Same document pool as RQ0 and RQ1, by construction (shared `src/analysis/shared/filters.py`):
-  - `drop_junk_sentences` — sentences with no letters (2,575) and Reuters sentences with no author (232); the two rules overlap, so 2,591 of 253,049 sentences go → 250,458
-  - `filter_min_sents` (≥ 5 sentences) on `doc_features.feather` — 42 documents (8,991 → 8,949; `doc_features` has 8,991 of the nominal 9,000) and 120 sentences → **250,338 sentences, 8,949 documents, 5,192,574 tokens**
+  - `drop_junk_sentences` — sentences with no letters (2,575), Reuters sentences with no author (232) and bare heading lines (452: a sentence that is only a label ending in a colon, such as `Introduction:` in GPT essays or `SAM:` in WritingPrompts); the rules overlap, so 3,043 of 253,049 sentences go → 250,006
+  - `filter_min_sents` (≥ 5 sentences) on `doc_features.feather` — 42 documents (8,991 → 8,949; `doc_features` has 8,991 of the nominal 9,000) and 120 sentences → **249,886 sentences, 8,949 documents, 5,191,038 tokens**
   - `restrict_to_docs` keeps only the sentences of those documents and raises if a pool document has no sentences, so the pools cannot drift apart
 - Pool by cell (documents / sentences / tokens):
 
 | Domain | Human | GPT | Claude |
 |---|---|---|---|
-| essay | 987 / 31,264 / 737,977 | 998 / 28,495 / 650,670 | 1,000 / 22,588 / 517,352 |
-| reuter | 992 / 20,334 / 574,876 | 996 / 21,514 / 575,677 | 1,000 / 17,838 / 447,759 |
-| wp | 987 / 43,966 / 646,396 | 997 / 31,088 / 581,009 | 992 / 33,251 / 460,858 |
+| essay | 987 / 31,256 / 737,953 | 998 / 28,128 / 649,409 | 1,000 / 22,566 / 517,274 |
+| reuter | 992 / 20,334 / 574,876 | 996 / 21,512 / 575,667 | 1,000 / 17,836 / 447,755 |
+| wp | 987 / 43,929 / 646,280 | 997 / 31,081 / 580,993 | 992 / 33,244 / 460,831 |
 
 ### 3.1 Whitespace tokens leave empty nodes in the parses
 
 - The parser tags newline tokens like any other token. When the bracketed parse string is read back the whitespace vanishes, leaving a preterminal with no word, e.g. `(PRP \n)`. They sit at the start of sentences that follow a paragraph break
 - 14.2% of pool sentences contain one — very unevenly: 57.1% of human Reuters sentences, against 12.7–12.9% for GPT and Claude Reuters, and 4–17% elsewhere. Left in, they put a human-vs-AI difference in the patterns that is really about paragraph formatting (and slots with no word in them)
-- **RQ0 and RQ1 are unaffected**: removing these nodes changes no Feng label for any of the 250,338 sentences (the algorithms only test for S, SBAR and VP). Caveat: nodes were removed from existing trees, not re-parsed without the whitespace tokens
+- **RQ0 and RQ1 are unaffected**: removing these nodes changes no Feng label for any of the 250,338 sentences of the pool at the time (before the heading rule) (the algorithms only test for S, SBAR and VP). Caveat: nodes were removed from existing trees, not re-parsed without the whitespace tokens
 - Fix: `mining.remove_empty_nodes` drops the empty nodes and any ancestor left with no words. A node that lost a child and is left with a single child of its own label is contracted into it, so `(NP (NP (PRP \n)) (NP (PRP He)))` becomes `(NP (PRP He))`
   - Only nodes that lost a child are contracted: benepar itself outputs `(NP (NP (PRP it)))` (1.7% of ghost-free sentences), which must stay
   - Tokens are unchanged (`leaves()` is identical before and after on 30,000 sampled sentences)
-- Effect: patterns 937,396 → 919,510; occurrences 8,017,419 → 7,989,459; the top-50 lists by z keep 42–50 of 50 patterns. The change is concentrated in a few patterns, e.g. Reuters `(S (``) (``) (S) (,) ('') (NP) (VP) (.))` fell from 1.87 to 0.02 per 1,000 tokens for human, while the clean `(S (``) (S) (,) ('') (NP) (VP) (.))` rose from 0.97 to 2.84 and its GPT z from −8.7 to −25.8: the artefact had split one construction across two variants and hidden a strong AI under-use
+- Effect (measured before the heading rule was added; final totals are in §7): patterns 937,396 → 919,510; occurrences 8,017,419 → 7,989,459; the top-50 lists by z keep 42–50 of 50 patterns. The change is concentrated in a few patterns, e.g. Reuters `(S (``) (``) (S) (,) ('') (NP) (VP) (.))` fell from 1.87 to 0.02 per 1,000 tokens for human, while the clean `(S (``) (S) (,) ('') (NP) (VP) (.))` rose from 0.97 to 2.84 and its GPT z from −8.7 to −25.8: the artefact had split one construction across two variants and hidden a strong AI under-use
 
 ## 4. Method
 
@@ -64,7 +64,7 @@
   $$r_{s,p} = 1000\,\frac{c_{s,p}}{T_s} \tag{1}$$
 
 - Tokens, not sentences (§5). Counts are occurrences, so a rate is not the share of sentences containing the pattern
-- A pattern enters the statistics table if it occurs in ≥ 10 documents of its domain (summed over the three sources): 14,864 / 14,407 / 13,807 patterns for essay / reuter / wp. The explorer lists those in ≥ 20 documents: 8,043 / 7,796 / 7,503
+- A pattern enters the statistics table if it occurs in ≥ 10 documents of its domain (summed over the three sources): 14,858 / 14,407 / 13,807 patterns for essay / reuter / wp. The explorer lists those in ≥ 20 documents: 8,042 / 7,796 / 7,503
 
 ### 4.4 Comparing an AI source with human
 
@@ -82,7 +82,7 @@
 
 ### 4.5 Parents and echo variants
 
-- Patterns overlap: one occurrence yields a pattern at each depth, so a phenomenon appears as a family of rows. The family is a tree by `parent(p)` (18,920 of the 23,342 explorer rows have their parent in the table)
+- Patterns overlap: one occurrence yields a pattern at each depth, so a phenomenon appears as a family of rows. The family is a tree by `parent(p)` (18,919 of the 23,341 explorer rows have their parent in the table)
 - A child is an **echo** of its parent for a comparison if the log2 ratios have the same sign and differ by less than θ (default 0.3, adjustable in the page). An echo says nothing its parent does not; for "both agree" it must be an echo for both AIs
 - Echoes are folded under their *leader*: the first non-echo ancestor reached by following parents. A row is folded only if its leader passes the current filters, so a search can never hide its own matches
 - Variants that are *not* echoes stay visible: they show where the parent's difference comes from. Worked example, Reuters, GPT:
@@ -98,7 +98,7 @@
 
 ### 4.6 Examples and slots
 
-- For every pattern in the statistics table and every source that uses it, up to 20 example occurrences are sampled (`build_motif_examples.py`): 124,016 (domain, source, pattern) groups, 1,237,357 examples; 23% of groups have the full 20 (most are rare)
+- For every pattern in the statistics table and every source that uses it, up to 20 example occurrences are sampled (`build_motif_examples.py`): 124,007 (domain, source, pattern) groups, 1,237,228 examples; 23% of groups have the full 20 (most are rare)
 - Sampling is deterministic and independent of processing order: each (sentence, pattern) pair gets a priority from a seeded hash (BLAKE2b, seed 0) and a group keeps its 20 lowest. Rank 0 is the lowest, so the first *n* examples are a uniform random sample of size *n*
 - A sentence offers at most one occurrence of a pattern (the leftmost, innermost), so examples are distinct sentences
 - Each example stores the token span of the pattern's root and the boundaries between its leaf slots. A constituent covers a contiguous run of tokens and its slots partition it, so the page can mark each slot without matching any text. Sentences are stored once, as space-separated parse tokens
@@ -139,7 +139,7 @@ Run from the project root; each step reads the previous step's output.
 ### 6.4 `src/analysis/motifs/build_explorer.py`
 
 - Fills `explorer_template.html` with the data and writes `results/motifs/motif_explorer.html` (about 11 MB). Edit the template, never the output
-- Embedded: every pattern in ≥ 20 documents of its domain (as one array per column, plus each row's parent index), and examples for the patterns that can come out near the top of a view — in each domain, the `--n-cut` (250) highest and lowest by z and by log2 ratio for GPT, for Claude, and for both agreeing — with `--per-source` (5) examples per source; about 1,570 patterns per domain and 49,436 sentences. Embedding examples for every pattern would make the file tens of megabytes
+- Embedded: every pattern in ≥ 20 documents of its domain (as one array per column, plus each row's parent index), and examples for the patterns that can come out near the top of a view — in each domain, the `--n-cut` (250) highest and lowest by z and by log2 ratio for GPT, for Claude, and for both agreeing — with `--per-source` (5) examples per source; about 1,570 patterns per domain and 49,452 sentences. Embedding examples for every pattern would make the file tens of megabytes
 
 ```
 python src/analysis/motifs/build_motif_counts.py
@@ -166,14 +166,14 @@ python src/analysis/motifs/build_explorer.py        # --n-cut, --per-source, --m
 | File | Rows | Columns |
 |---|---|---|
 | `motif_docs.feather` | 8,949 | `doc_idx`, `domain`, `source`, `doc_id`, `author`, `n_sents`, `n_tokens` |
-| `motif_patterns.feather` | 919,510 | `pattern_id`, `pattern` |
-| `motif_counts.feather` | 4,808,332 | `doc_idx`, `pattern_id`, `count` (one row per document and pattern used) |
-| `motif_sentences.feather` | 250,338 | `sent_id`, `doc_idx`, `tokens` |
-| `motif_examples.feather` | 1,237,357 | `domain`, `source`, `pattern_id`, `rank`, `sent_id`, `start`, `end`, `bounds` |
+| `motif_patterns.feather` | 919,325 | `pattern_id`, `pattern` |
+| `motif_counts.feather` | 4,807,773 | `doc_idx`, `pattern_id`, `count` (one row per document and pattern used) |
+| `motif_sentences.feather` | 249,886 | `sent_id`, `doc_idx`, `tokens` |
+| `motif_examples.feather` | 1,237,228 | `domain`, `source`, `pattern_id`, `rank`, `sent_id`, `start`, `end`, `bounds` |
 
 - `bounds` — comma-separated token indices where one slot ends and the next begins; slots are `[start, b0), [b0, b1), …, [b_last, end)`, in the order the leaves appear in the pattern string
 
-### 7.2 `results/motifs/motif_stats.csv` — 43,078 rows
+### 7.2 `results/motifs/motif_stats.csv` — 43,072 rows
 
 | Column | Description |
 |---|---|
@@ -206,3 +206,9 @@ python src/analysis/motifs/build_explorer.py        # --n-cut, --per-source, --m
 - **Document floor.** Patterns used in fewer than 10 (statistics) or 20 (explorer) documents of a domain are not listed, so the rare tail of the vocabulary is out of view; the per-document count table keeps all of it for the repertoire analyses
 - **Examples are a random draw**, not a curated selection; patterns outside the embedded cut have none in the page (they are still in `motif_examples.feather`)
 - **Smoothing** (`a = 0.5`) matters only for very small counts; a pattern one source never uses gets a large but finite ratio
+- **How the AI texts were produced** (Ghostbuster, Verma et al., 2024: templates in Tables 7–8 of the paper, per-document prompts in `data/raw/ghostbuster-data/{essay,wp}/prompts`). Differences in citations, quotations and parentheticals reflect the tasks as much as the writers:
+  - Essays: ChatGPT wrote a prompt from each human essay and a second call wrote the essay to it, with no mention of sources. 8.9% of human essay sentences contain an author-year or numbered citation, against 0.06% (GPT) and 0.18% (Claude); 16.5% contain a parenthesis, against 2.9% and 2.1%
+  - News: written from a ChatGPT-made headline alone, with no source material, which plausibly accounts for the missing quotations and reported speech
+  - WritingPrompts: the real Reddit prompt; the human texts are the last 100 posts of each of the top 50 posters, so they cluster by author
+  - Models: GPT is gpt-3.5-turbo; the Claude version is not stated (2023). Length was matched to the nearest 100 words for ChatGPT, but Claude's documents are shorter (median words human / ChatGPT / Claude: essays 529 / 559 / 442, news 498 / 510 / 384, stories 455 / 512 / 384). That lowers Claude's document counts, since a pattern is less likely to appear in a shorter document, but not its rates per token
+  - These patterns are left in, not filtered out. A column flagging patterns that sit mostly in sentences with a citation, parenthesis or quotation is a planned addition

@@ -22,11 +22,13 @@
 ## 3. Data, Cleaning & Filtering
 
 - Input: `data/processed/features/doc_features.feather` — per-document Feng category counts and `n_sents`, built by `src/analysis/features/build_doc_features.py`
-- Two cleaning rules, applied to sentences before aggregation (shared with RQ1):
+- Three cleaning rules, applied to sentences before aggregation (shared with RQ1 and the motif track):
   - **Sentences with no letters dropped** — 2,459 (lone `"` 1,406 times; also `.`, `*`, list numbers): sentence-splitter artefacts, all labelled OTHER. They were 6–69% of a group's type-OTHER sentences (reuter GPT 69%, Claude 63%)
   - **Reuter sentences with no author dropped** — 108: orphans the author fix couldn't assign, which formed 43 pseudo-documents of 1–6 sentences
-  - Effect on RQ0: reuter AI type OTHER fell from 1.8% to 0.6% (GPT) and 1.9% to 0.8% (Claude) — about two-thirds artefact; reuter type OTHER reversed order (human now highest)
-- Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 42 documents excluded (0.47%) → **8,949 documents, 987–1,000 per group**; same pool as RQ1
+  - **Bare heading lines dropped** — 452: a sentence that is only a label ending in a colon (`Introduction:` 107 times in GPT essays; `Conclusion:`; speaker labels such as `SAM:` in WritingPrompts), which the splitter turns into a sentence of its own. 15.5% of sampled GPT essays contain one, against 0.5% of human and 0% of Claude. Added after the rest; they were 23% of GPT's essay type-OTHER sentences
+  - Effect on RQ0 of the heading rule: only essay GPT moves, type OTHER 3.86% → 3.05% (human 2.72%) and structure OTHER 26.5% → 25.8%; SIMPLE 54.8% → 55.2%. Every other cell changes by under 0.1 pp
+  - Effect of the first two rules on RQ0: reuter AI type OTHER fell from 1.8% to 0.6% (GPT) and 1.9% to 0.8% (Claude) — about two-thirds artefact; reuter type OTHER reversed order (human now highest)
+- Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 42 documents excluded (0.47%) → **8,949 documents, 987–1,000 per group**; same pool as RQ1 and the motif track
 - Denominator is `n_sents` for every category, both `OTHER`s included
 - Each scheme's counts sum to `n_sents` in every document (asserted in `build_doc_features.py`), so each document's rates within a scheme sum to exactly 1
 
@@ -66,7 +68,7 @@
 
 - Observed spread always overstates real spread, more so for shorter documents — which is why RQ1 needs to separate the two terms (RQ1 methodology §4), and RQ0 doesn't
 
-### 5.3 Checked against the alternatives (cleaned data)
+### 5.3 Checked against the alternatives (cleaned data; measured before the heading rule, which moves only essay GPT, by up to 0.8 pp)
 
 - **Full Beta-binomial model** (weights documents by `n_i/(1+(n_i−1)ρ)`): Eq. 2 is within 0.93 pp of it at worst, 0.23 pp in a typical cell; error bars (Eq. 3) are ±0.11 to ±1.00 pp
   - No bar group changes order between the two
@@ -95,10 +97,10 @@
 ### 6.2 `src/analysis/rq0/plot_rq0.py`
 
 - **Step 1**: read `rq0_rates.csv` — no recomputation, so charts can be restyled freely
-- **Step 2**: one figure per domain, two panels (`sentence_type`, 5 categories; `sentence_structure`, 3; width ratios 5:3)
+- **Step 2**: one figure per domain, two panels (`sentence_type`, 5 categories; `sentence_structure`, 3; width ratios 5:3). `--grouped` draws one figure with the three domains as rows on a shared y-axis; `--stacked` draws one figure of horizontal stacked bars, one per domain and source, split into each scheme's categories (the two are mutually exclusive)
 - **Step 3**: grouped bars human / GPT / Claude per category, in a fixed category order; one colour per source (Okabe-Ito), the same in every figure; y-axis in % of sentences
-- **Step 4**: error bars = 1.96 × SE
-- **Step 5**: save PNG (viewing) and PDF (vector, for the LaTeX write-up)
+- **Step 4**: error bars = 1.96 × SE (stacked bars carry none; the intervals stay in the CSV)
+- **Step 5**: save PNG; with `--pdf`, save vector PDF instead (never both)
 
 ## 7. Output Specifications
 
@@ -114,9 +116,9 @@
 | `se` | float | Eq. 3 |
 | `ci_low`, `ci_high` | float | `mean_rate ∓ 1.96·se` |
 
-### 7.2 Figures — `results/rq0/rq0_rates_{essay,reuter,wp}.{png,pdf}`
+### 7.2 Figures — `results/rq0/`
 
-- The answer to RQ0 — one figure per domain, as §6.2
+- The answer to RQ0, as §6.2: `rq0_rates_{essay,reuter,wp}.png` (default), `rq0_rates_grouped.png` (`--grouped`) and `rq0_rates_stacked.png` (`--stacked`); `.pdf` instead of `.png` with `--pdf`
 
 ## 8. Limitations & Notes
 

@@ -25,9 +25,10 @@
 ## 3. Data, Cleaning & Filtering
 
 - Input: `data/processed/features/doc_features.feather`, built by `src/analysis/features/build_doc_features.py` from sentence-level Feng labels over the Ghostbuster constituency parses
-- Two cleaning rules, applied to sentences before aggregation (shared with RQ0):
+- Three cleaning rules, applied to sentences before aggregation (shared with RQ0 and the motif track):
   - **Sentences with no letters dropped** — 2,459 (lone `"` 1,406 times; also `.`, `*`, list numbers): sentence-splitter artefacts, all labelled OTHER; 6–69% of a group's type-OTHER sentences (reuter GPT 69%, Claude 63%)
   - **Reuter sentences with no author dropped** — 108: orphans the author fix couldn't assign, which formed 43 pseudo-documents of 1–6 sentences
+  - **Bare heading lines dropped** — 452: a sentence that is only a label ending in a colon (`Introduction:` 107 times in GPT essays; speaker labels such as `SAM:` in WritingPrompts). Added later: 15.5% of sampled GPT essays contain one, against 0.5% of human and 0% of Claude, and they were 23% of GPT's essay type-OTHER sentences. Effect on RQ1: **0 of 48 verdicts change**; essay GPT type OTHER `ρ̂` 0.166 → 0.173 (FDR p 0.0082 → 0.0134, still AI more variable). The scan and sensitivity figures below were produced before this rule
   - Result: 8,991 documents
 - How they were found: a scan for documents extreme under a fitted Beta-binomial (p < 10⁻⁴ per document-category, ~7 expected by chance) flagged 25 pairs in 20 documents; inspection traced most to these two artefacts. After cleaning: 17 pairs in 14 documents, mostly genuine writing; six judged non-prose feed the sensitivity pass (§4.6)
 - Filter: `n_sents ≥ 5` via the shared `filter_min_sents` (`src/analysis/shared/filters.py`) — 42 documents excluded (0.47%) → **8,949 documents, 987–1,000 per group**; same pool as RQ0
@@ -132,20 +133,20 @@
 
 | Domain | Comparison | Scheme | Category | ρ human | ρ AI | z | FDR p |
 |---|---|---|---|---|---|---|---|
-| essay | vs GPT | type | COMPOUND | 0.0207 | 0.0450 | −4.21 | 0.0002 |
-| essay | vs GPT | type | OTHER | 0.0987 | 0.1660 | −3.06 | 0.0082 |
-| reuter | vs Claude | structure | PERIODIC | 0.0364 | 0.0096 | 3.87 | 0.0005 |
-| reuter | vs Claude | type | COMPOUND | 0.0315 | 0.0062 | 3.61 | 0.0012 |
-| wp | vs Claude | structure | PERIODIC | 0.0549 | 0.0146 | 6.43 | < 0.0001 |
-| wp | vs Claude | structure | OTHER | 0.0732 | 0.0409 | 5.37 | < 0.0001 |
-| wp | vs Claude | type | SIMPLE | 0.0464 | 0.0273 | 3.84 | 0.0005 |
-| wp | vs Claude | type | COMPLEX-COMPOUND | 0.0511 | 0.0102 | 5.54 | < 0.0001 |
-| wp | vs Claude | type | OTHER | 0.0478 | 0.0317 | 2.56 | 0.0364 |
-| wp | vs GPT | structure | PERIODIC | 0.0549 | 0.0137 | 6.27 | < 0.0001 |
-| wp | vs GPT | structure | OTHER | 0.0732 | 0.0180 | 9.23 | < 0.0001 |
-| wp | vs GPT | type | SIMPLE | 0.0464 | 0.0144 | 6.46 | < 0.0001 |
-| wp | vs GPT | type | COMPLEX | 0.0371 | 0.0162 | 4.15 | 0.0002 |
-| wp | vs GPT | type | COMPLEX-COMPOUND | 0.0511 | 0.0102 | 5.31 | < 0.0001 |
+| essay | vs GPT | type | COMPOUND | 0.0208 | 0.0468 | −4.45 | < 0.0001 |
+| essay | vs GPT | type | OTHER | 0.0978 | 0.1728 | −2.91 | 0.0134 |
+| reuter | vs Claude | structure | PERIODIC | 0.0364 | 0.0097 | 3.86 | 0.0005 |
+| reuter | vs Claude | type | COMPOUND | 0.0315 | 0.0063 | 3.60 | 0.0013 |
+| wp | vs Claude | structure | PERIODIC | 0.0548 | 0.0146 | 6.43 | < 0.0001 |
+| wp | vs Claude | structure | OTHER | 0.0733 | 0.0408 | 5.40 | < 0.0001 |
+| wp | vs Claude | type | SIMPLE | 0.0465 | 0.0273 | 3.84 | 0.0005 |
+| wp | vs Claude | type | COMPLEX-COMPOUND | 0.0511 | 0.0102 | 5.55 | < 0.0001 |
+| wp | vs Claude | type | OTHER | 0.0478 | 0.0319 | 2.51 | 0.0411 |
+| wp | vs GPT | structure | PERIODIC | 0.0548 | 0.0140 | 6.22 | < 0.0001 |
+| wp | vs GPT | structure | OTHER | 0.0733 | 0.0178 | 9.27 | < 0.0001 |
+| wp | vs GPT | type | SIMPLE | 0.0465 | 0.0143 | 6.48 | < 0.0001 |
+| wp | vs GPT | type | COMPLEX | 0.0374 | 0.0162 | 4.21 | 0.0001 |
+| wp | vs GPT | type | COMPLEX-COMPOUND | 0.0511 | 0.0103 | 5.31 | < 0.0001 |
 
 - Reading:
   - **wp — clear yes**: human stories vary 2–5× more between documents; largest gaps COMPLEX-COMPOUND and PERIODIC
@@ -157,7 +158,7 @@
 ### 4.8 Limitations
 
 - The noise definition: sentence order treated as irrelevant (§4.6)
-- Independence: handled for reuter by resampling authors; essay and wp have no author information, so documents are assumed independent
+- Independence: handled for reuter by resampling authors; essay and wp have no author information in the data, so documents are assumed independent. The Ghostbuster paper (Verma et al., 2024) says the human WritingPrompts texts are the last 100 posts of each of the top 50 posters, so human wp is clustered like Reuters. Sensitivity — inflate the human SE in wp by a factor *k* and re-correct all 48 tests together: wp "human more variable" results 10 (k = 1), 9 (1.5), 7 (2), 1 (3); total significant 14, 13, 11, 5. The Reuters author effect on the SE reached 1.9×, so k = 2 is the plausible upper end
 - The six-document judgement is by inspection, which is why it is a sensitivity pass, not an exclusion
 - `ρ̂` ratios are unstable near zero (e.g. reuter GPT type OTHER) — the test uses the difference, not the ratio
 - Per-category by design — no single composition-level number (the shared-`ρ` model that would give one didn't fit, §6)
@@ -192,7 +193,7 @@
 |---|---|
 | `src/analysis/features/build_doc_features.py` | `data/processed/features/doc_features.feather` (cleaning, §3) |
 | `src/analysis/rq1/run_rq1_variance.py` | `rq1_variance.csv`, `rq1_variance_tests.csv`, `rq1_variance_tests_sensitivity.csv` |
-| `src/analysis/rq1/plot_rq1_variance.py` | `rq1_variance_{essay,reuter,wp}.{png,pdf}` |
+| `src/analysis/rq1/plot_rq1_variance.py` | `rq1_variance_{essay,reuter,wp}.png`, `rq1_variance_grouped.png` (`--grouped`); `.pdf` instead with `--pdf` |
 | `src/analysis/shared/filters.py` | — (`filter_min_sents`, shared with RQ0) |
 | `src/analysis/shared/significance_utils.py` | — (`apply_fdr`) |
 
@@ -240,9 +241,9 @@
 
 - `domain`, `comparison`, `scheme`, `category`; `rho_diff`, `p_value_fdr`, `verdict` for each pass (suffixes `_main`, `_excl`); `verdict_changed` (bool)
 
-### 9.4 Figures — `results/rq1/rq1_variance_{essay,reuter,wp}.{png,pdf}`
+### 9.4 Figures — `results/rq1/rq1_variance_{essay,reuter,wp}.png`, `rq1_variance_grouped.png`
 
-- **RQ1's answer** — RQ0's layout: per domain, two panels (sentence type, sentence structure), grouped bars human / GPT / Claude, `ρ̂` as % of maximum, asymmetric 95% resampling intervals, zero line
+- **RQ1's answer** — RQ0's layout: per domain, two panels (sentence type, sentence structure), grouped bars human / GPT / Claude, `ρ̂` as % of maximum, asymmetric 95% resampling intervals, zero line. `--grouped` puts the three domains in one figure on a shared y-axis; `--pdf` saves vector PDFs instead of PNGs
 
 ## 10. Open Items
 
