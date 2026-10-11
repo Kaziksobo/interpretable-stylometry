@@ -98,7 +98,7 @@
 
 - **Step 1**: read `rq0_rates.csv` — no recomputation, so charts can be restyled freely
 - **Step 2**: one figure per domain, two panels (`sentence_type`, 5 categories; `sentence_structure`, 3; width ratios 5:3). `--grouped` draws one figure with the three domains as rows on a shared y-axis; `--stacked` draws one figure of horizontal stacked bars, one per domain and source, split into each scheme's categories (the two are mutually exclusive)
-- **Step 3**: grouped bars human / GPT / Claude per category, in a fixed category order; one colour per source (Okabe-Ito), the same in every figure; y-axis in % of sentences
+- **Step 3**: grouped bars human / GPT / Claude per category, in a fixed category order; one colour per source (Okabe-Ito), the same in every figure (names, colours, category order and the save step live in `src/analysis/shared/plotting.py`, shared with RQ1); y-axis in % of sentences
 - **Step 4**: error bars = 1.96 × SE (stacked bars carry none; the intervals stay in the CSV)
 - **Step 5**: save PNG; with `--pdf`, save vector PDF instead (never both)
 

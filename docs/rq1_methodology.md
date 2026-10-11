@@ -196,6 +196,7 @@
 | `src/analysis/rq1/plot_rq1_variance.py` | `rq1_variance_{essay,reuter,wp}.png`, `rq1_variance_grouped.png` (`--grouped`); `.pdf` instead with `--pdf` |
 | `src/analysis/shared/filters.py` | — (`filter_min_sents`, shared with RQ0) |
 | `src/analysis/shared/significance_utils.py` | — (`apply_fdr`) |
+| `src/analysis/shared/plotting.py` | — (source, domain and scheme names, colours, `doc_count_footnote`, `save_figure`; shared with RQ0) |
 
 ### 8.2 Function → step (`run_rq1_variance.py`)
 

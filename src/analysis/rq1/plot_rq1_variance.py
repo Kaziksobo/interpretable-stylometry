@@ -32,34 +32,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from src.analysis.shared.plotting import (
+    BAR_WIDTH,
+    COLOURS,
+    DOMAIN_TITLES,
+    SCHEME_TITLES,
+    SCHEMES,
+    SOURCE_LABELS,
+    SOURCES,
+    doc_count_footnote,
+    save_figure,
+)
+
 PROJECT_ROOT = next(
     p for p in Path(__file__).parents if (p / "pyproject.toml").exists()
 )
 VARIANCE_INPUT = PROJECT_ROOT / "results" / "rq1" / "rq1_variance.csv"
 OUTPUT_DIR = PROJECT_ROOT / "results" / "rq1"
-
-SOURCES = ["human", "gpt", "claude"]
-SOURCE_LABELS = {"human": "Human", "gpt": "GPT", "claude": "Claude"}
-# Okabe-Ito palette: distinguishable for colour-blind readers; same in every figure
-COLOURS = {"human": "#0072B2", "gpt": "#E69F00", "claude": "#009E73"}
-
-DOMAIN_TITLES = {
-    "essay": "Student essays",
-    "reuter": "Reuters news",
-    "wp": "WritingPrompts",
-}
-
-# fixed category order per panel -- labels must match rq1_variance.csv exactly
-SCHEMES: dict[str, list[str]] = {
-    "sentence_type": ["SIMPLE", "COMPLEX", "COMPOUND", "COMPLEX-COMPOUND", "OTHER"],
-    "sentence_structure": ["LOOSE", "PERIODIC", "OTHER"],
-}
-SCHEME_TITLES = {
-    "sentence_type": "Sentence type",
-    "sentence_structure": "Sentence structure",
-}
-
-BAR_WIDTH = 0.26
 
 
 def _plot_panel(ax: plt.Axes, rates: pd.DataFrame, scheme: str) -> None:
@@ -100,24 +89,6 @@ def _plot_panel(ax: plt.Axes, rates: pd.DataFrame, scheme: str) -> None:
     ax.grid(axis="y", alpha=0.3)
     ax.set_axisbelow(True)
     ax.axhline(0, color="black", linewidth=0.8)
-
-
-def _doc_footnote(rates: pd.DataFrame) -> str:
-    """Builds the per-domain document-count footnote for multi-domain figures.
-
-    Args:
-        rates (pd.DataFrame): All 72 rows of rq1_variance.csv.
-
-    Returns:
-        str: e.g. "Documents (human / GPT / Claude): Student essays
-            1000/998/1000; ...".
-    """
-    n = rates.groupby(["domain", "source"])["n_docs"].first()
-    parts = [
-        f"{title} {n[(domain, 'human')]}/{n[(domain, 'gpt')]}/{n[(domain, 'claude')]}"
-        for domain, title in DOMAIN_TITLES.items()
-    ]
-    return "Documents (human / GPT / Claude): " + "; ".join(parts)
 
 
 def _plot_domain(domain: str, rates: pd.DataFrame) -> plt.Figure:
@@ -194,7 +165,9 @@ def _plot_grouped(rates: pd.DataFrame) -> plt.Figure:
         ncol=len(SOURCES),
         frameon=False,
     )
-    fig.text(0.5, 0.005, _doc_footnote(rates), ha="center", fontsize=8, color="0.3")
+    fig.text(
+        0.5, 0.005, doc_count_footnote(rates), ha="center", fontsize=8, color="0.3"
+    )
     fig.suptitle("RQ1: between-document variance by domain and source")
     fig.tight_layout(rect=(0, 0.07, 1, 1))
     return fig
@@ -213,7 +186,6 @@ def main(pdf: bool = False, grouped: bool = False):
         grouped (bool): Save the single grouped figure (domains as rows)
             instead of one per domain.
     """
-    ext = "pdf" if pdf else "png"
     rates = pd.read_csv(VARIANCE_INPUT)
 
     figures: dict[str, plt.Figure] = {}
@@ -224,12 +196,7 @@ def main(pdf: bool = False, grouped: bool = False):
             figures[domain] = _plot_domain(domain, rates)
 
     for name, fig in figures.items():
-        fig.savefig(
-            OUTPUT_DIR / f"rq1_variance_{name}.{ext}",
-            dpi=200,  # ignored for PDF (vector)
-            bbox_inches="tight",
-        )
-        plt.close(fig)
+        save_figure(fig, OUTPUT_DIR / f"rq1_variance_{name}", pdf)
 
 
 if __name__ == "__main__":
