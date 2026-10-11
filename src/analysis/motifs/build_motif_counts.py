@@ -22,6 +22,7 @@ uses only a small fraction of the pattern vocabulary:
     motif_patterns.feather   one row per distinct pattern
         pattern_id : int32
         pattern    : str   - canonical bracketed form, e.g. "(S (NP) (VP))"
+        depth      : int8  - levels in the pattern, root included (2, 3 or 4)
     motif_counts.feather     one row per (document, pattern) with count > 0
         doc_idx, pattern_id : int32
         count      : int32 - occurrences of the pattern in the document
@@ -47,7 +48,7 @@ from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from mining import count_patterns, remove_empty_nodes
+from mining import count_patterns, pattern_depth, remove_empty_nodes
 from nltk import Tree
 from tqdm import tqdm
 
@@ -176,9 +177,9 @@ def _count_all(
 
     Returns:
         tuple[pd.DataFrame, pd.DataFrame, np.ndarray, int]: The (doc_idx,
-            pattern_id, count) table, the (pattern_id, pattern) table, each
-            document's token count (indexed by doc_idx), and the number of
-            parse strings that failed to parse.
+            pattern_id, count) table, the (pattern_id, pattern, depth) table,
+            each document's token count (indexed by doc_idx), and the number
+            of parse strings that failed to parse.
     """
     n_docs = len(parses_by_doc)
     chunks = [
@@ -219,7 +220,11 @@ def _count_all(
     ).sort_values(["doc_idx", "pattern_id"], ignore_index=True)
 
     patterns_df = pd.DataFrame(
-        {"pattern_id": np.arange(len(vocab), dtype=np.int32), "pattern": list(vocab)}
+        {
+            "pattern_id": np.arange(len(vocab), dtype=np.int32),
+            "pattern": list(vocab),
+            "depth": np.array([pattern_depth(p) for p in vocab], dtype=np.int8),
+        }
     )
     return counts_df, patterns_df, n_tokens, n_failed
 
@@ -257,6 +262,7 @@ def main() -> None:
     assert counts_df["doc_idx"].between(0, len(docs) - 1).all()
     assert counts_df["count"].gt(0).all()
     assert not counts_df.duplicated(["doc_idx", "pattern_id"]).any()
+    assert patterns_df["depth"].between(MIN_DEPTH, MAX_DEPTH).all()
 
     docs["author"] = docs["author"].replace(NO_AUTHOR, None)
 

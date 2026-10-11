@@ -166,7 +166,7 @@ python src/analysis/motifs/build_explorer.py        # --n-cut, --per-source, --m
 | File | Rows | Columns |
 |---|---|---|
 | `motif_docs.feather` | 8,949 | `doc_idx`, `domain`, `source`, `doc_id`, `author`, `n_sents`, `n_tokens` |
-| `motif_patterns.feather` | 919,325 | `pattern_id`, `pattern` |
+| `motif_patterns.feather` | 919,325 | `pattern_id`, `pattern`, `depth` (levels in the pattern, root included: 2, 3 or 4) |
 | `motif_counts.feather` | 4,807,773 | `doc_idx`, `pattern_id`, `count` (one row per document and pattern used) |
 | `motif_sentences.feather` | 249,886 | `sent_id`, `doc_idx`, `tokens` |
 | `motif_examples.feather` | 1,237,228 | `domain`, `source`, `pattern_id`, `rank`, `sent_id`, `start`, `end`, `bounds` |
