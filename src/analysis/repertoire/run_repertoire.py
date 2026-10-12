@@ -29,9 +29,15 @@ Inputs:
 Outputs (sensitivity runs add a suffix such as _depth3_tokens):
     results/repertoire/repertoire_metrics.csv       one row per (domain, source)
     results/repertoire/repertoire_differences.csv   one row per comparison x metric
+    results/repertoire/repertoire_results.csv       one row per domain x metric x
+                                                    source: everything a results
+                                                    table cell needs
+build_repertoire_tables.py turns the three runs' results CSVs into the markdown
+tables.
 
 Usage (from the project root):
     python src/analysis/repertoire/run_repertoire.py
+    python src/analysis/repertoire/run_repertoire.py --all
     python src/analysis/repertoire/run_repertoire.py --depth 3
     python src/analysis/repertoire/run_repertoire.py --budget occurrences
     python src/analysis/repertoire/run_repertoire.py --null-check
@@ -67,6 +73,9 @@ SEED = 0
 # repertoire: fewer blocks or a lower effective number, or more concentration
 NARROWER = {"types": -1, "types_min5": -1, "effective_types": -1, "cover_50": +1}
 SIZE_COLUMNS = ["documents", "tokens"]  # realised draw sizes, not metrics
+
+# the main run, then the two sensitivity runs (--all runs all three)
+RUNS = [(2, "tokens"), (2, "occurrences"), (3, "tokens")]
 
 
 def load_matrix(depth: int) -> tuple[pd.DataFrame, sparse.csr_matrix]:
@@ -285,6 +294,60 @@ def compare(summary: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def results_table(
+    summary: pd.DataFrame, differences: pd.DataFrame, depth: int, budget_by: str
+) -> pd.DataFrame:
+    """Collects everything one results-table cell needs, one row per cell.
+
+    Args:
+        summary (pd.DataFrame): Metric means and standard errors, indexed by
+            (domain, source).
+        differences (pd.DataFrame): Output of compare.
+        depth (int): Pattern depth of the run.
+        budget_by (str): What the run's equal-size budget measured.
+
+    Returns:
+        pd.DataFrame: One row per domain x headline metric x source, with the
+            value, its margin of error (1.96 standard errors) and, for AI
+            rows, the difference from human, the relative difference, the
+            corrected p and whether it is significant (1 or 0), plus the
+            run's depth, budget type, budget, sampled fraction and draws.
+    """
+    rows = []
+    for domain in DOMAINS:
+        for metric in NARROWER:
+            for source in SOURCES:
+                s = summary.loc[(domain, source)]
+                row = {
+                    "domain": domain,
+                    "metric": metric,
+                    "source": source,
+                    "value": s[f"{metric}_mean"],
+                    "margin": 1.96 * s[f"{metric}_se"],
+                }
+                if source != "human":
+                    d = differences[
+                        (differences["domain"] == domain)
+                        & (differences["comparison"] == f"human_vs_{source}")
+                        & (differences["metric"] == metric)
+                    ].iloc[0]
+                    row |= {
+                        "difference": d["diff"],
+                        "relative_difference": d["relative_diff"],
+                        "p_fdr": d["p_fdr"],
+                        "significant": int(d["p_significant"]),
+                    }
+                row |= {
+                    "depth": depth,
+                    "budget_by": budget_by,
+                    "budget": s["budget"],
+                    "sampled_fraction": s["sampled_fraction"],
+                    "n_draws": s["n_draws"],
+                }
+                rows.append(row)
+    return pd.DataFrame(rows)
+
+
 def random_halves(
     rng: np.random.Generator, docs: pd.DataFrame, idx: np.ndarray, by_author: bool
 ) -> tuple[np.ndarray, np.ndarray]:
@@ -399,6 +462,9 @@ def main(depth: int = 2, budget_by: str = "tokens", n_draws: int = N_DRAWS) -> N
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
     summary.to_csv(OUTPUT_DIR / f"repertoire_metrics{tag}.csv")
     differences.to_csv(OUTPUT_DIR / f"repertoire_differences{tag}.csv", index=False)
+    results_table(summary, differences, depth, budget_by).to_csv(
+        OUTPUT_DIR / f"repertoire_results{tag}.csv", index=False
+    )
 
     print(f"depth {depth}, budget by {budget_by}, {n_draws} draws per group\n")
     print(
@@ -429,6 +495,12 @@ if __name__ == "__main__":
         action="store_true",
         help="test the intervals on random human-vs-human splits instead",
     )
+    parser.add_argument(
+        "--all",
+        action="store_true",
+        help="run the main analysis and both sensitivity runs (ignores --depth, "
+        "--budget)",
+    )
     args = parser.parse_args()
 
     if args.null_check:
@@ -436,5 +508,8 @@ if __name__ == "__main__":
         for domain in DOMAINS:
             rates = null_check(docs, matrix, domain)
             print(domain, {m: f"{100 * r:.1f}%" for m, r in rates.items()})
+    elif args.all:
+        for run_depth, run_budget in RUNS:
+            main(depth=run_depth, budget_by=run_budget, n_draws=args.draws)
     else:
         main(depth=args.depth, budget_by=args.budget, n_draws=args.draws)
